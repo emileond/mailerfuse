@@ -101,9 +101,9 @@ function AuthForm({ viewMode = 'signup' }) {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="flex flex-col gap-4 py-8"
+      className="min-w-80 flex flex-col gap-4 py-8"
     >
-      <h2 className="text-2xl font-bold">
+      <h2 className="text-3xl font-bold">
         {view === 'signup' ? 'Create an account' : 'Login'}
       </h2>
       <Link
@@ -167,7 +167,7 @@ function AuthForm({ viewMode = 'signup' }) {
         />
       )}
       <Button
-        color="secondary"
+        color="primary"
         variant="solid"
         type="submit"
         size="lg"
