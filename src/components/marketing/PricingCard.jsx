@@ -22,16 +22,12 @@ function PricingCard({
     price: PropTypes.number,
     yearlyPrice: PropTypes.number,
     isYearly: PropTypes.bool,
-    features: PropTypes.arrayOf(
-      PropTypes.shape({
-        text: PropTypes.string,
-      })
-    ),
+    features: PropTypes.array,
     highlight: PropTypes.bool,
   }
   return (
     <Card
-      className={`basis-[300px] grow ${highlight && 'border-2 border-primary'}`}
+      className={`basis-[200px] grow ${highlight && 'border-2 border-primary'}`}
     >
       <CardHeader>
         <div className="flex flex-col gap-1 p-3">
@@ -45,9 +41,9 @@ function PricingCard({
             </h3>
             <p className="text-small text-default-500"> / month</p>
           </div>
-          {isYearly && (
-            <p className="text-small text-default-500">Billed yearly</p>
-          )}
+          <p className="text-small text-default-400">
+            Billed {isYearly ? 'yearly' : 'monthly'}
+          </p>
         </div>
       </CardHeader>
       <Divider />
@@ -62,7 +58,11 @@ function PricingCard({
         </div>
       </CardBody>
       <CardFooter>
-        <Button className="w-full" color="primary">
+        <Button
+          className="w-full"
+          color="primary"
+          variant={highlight ? 'shadow' : 'ghost'}
+        >
           Get started
         </Button>
       </CardFooter>

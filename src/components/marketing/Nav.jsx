@@ -30,7 +30,7 @@ export default function NavBar() {
     },
   ]
   return (
-    <Navbar isBlurred maxWidth="xl">
+    <Navbar maxWidth="xl" className="bg-content1">
       <NavbarContent className="sm:hidden" justify="start">
         <NavbarMenuToggle />
       </NavbarContent>

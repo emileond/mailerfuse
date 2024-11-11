@@ -32,7 +32,7 @@ const logoutUser = async () => {
 const registerUser = async ({ email, password }) => {
   await account.create(ID.unique(), email, password)
   await account.createEmailPasswordSession(email, password)
-  await account.createVerification('http://localhost:5173/')
+  await account.createVerification(import.meta.env.VITE_PUBLIC_URL)
   return
 }
 

@@ -9,7 +9,9 @@ export default function ThemeSwitcher() {
 
   const handleClick = () => {
     setDarkMode(!darkMode)
-    setIcon(darkMode ? <RiSunLine /> : <RiMoonClearLine />)
+    setIcon(
+      darkMode ? <RiSunLine fontSize={18} /> : <RiMoonClearLine fontSize={18} />
+    )
   }
 
   return (

@@ -7,7 +7,7 @@ function PageLayout({ children, maxW = '6xl' }) {
     maxW: PropTypes.string,
   }
   return (
-    <div className={`p-6 grow flex justify-center`}>
+    <div className={`bg-content1 p-6 grow flex justify-center`}>
       <div className={`w-full max-w-${maxW} flex flex-col gap-6 `}>
         <div className="w-full flex justify-between gap-3">
           <h1 className="font-semibold">PageLayout</h1>
