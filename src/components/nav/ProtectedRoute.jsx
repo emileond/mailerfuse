@@ -12,7 +12,7 @@ function ProtectedRoute({ children }) {
 
   useEffect(() => {
     if (!user) {
-      navigate('/')
+      navigate('/signup')
     }
   }, [user, navigate])
 

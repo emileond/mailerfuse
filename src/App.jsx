@@ -1,22 +1,39 @@
-import { useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import AuthForm from './components/auth/AuthForm'
-import { useUser } from './hooks/react-query/user/useUser'
+import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { useDarkMode } from './hooks/theme/useDarkMode.js'
+import DashboardPage from './pages/Dashboard.jsx'
+import ProtectedRoute from './components/nav/ProtectedRoute.jsx'
+import LandingPage from './pages/Landing.jsx'
+import AuthPage from './pages/Auth.jsx'
 
 function App() {
-  const { data: user } = useUser()
-  const navigate = useNavigate()
-
-  useEffect(() => {
-    if (user) {
-      navigate('/dashboard')
-    }
-  }, [user, navigate])
+  const [darkMode] = useDarkMode()
+  const router = createBrowserRouter([
+    {
+      path: '/',
+      element: <LandingPage />,
+    },
+    {
+      path: '/login',
+      element: <AuthPage authMode="login" />,
+    },
+    {
+      path: '/signup',
+      element: <AuthPage authMode="signup" />,
+    },
+    {
+      path: '/dashboard',
+      element: (
+        <ProtectedRoute>
+          <DashboardPage />
+        </ProtectedRoute>
+      ),
+    },
+  ])
 
   return (
-    <div className="w-screen h-screen flex justify-center items-center">
-      <AuthForm viewMode="login" />
-    </div>
+    <main className={`${darkMode ? 'dark' : ''} text-foreground bg-background`}>
+      <RouterProvider router={router} />
+    </main>
   )
 }
 
