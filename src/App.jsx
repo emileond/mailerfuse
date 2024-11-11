@@ -4,6 +4,8 @@ import DashboardPage from './pages/Dashboard.jsx'
 import ProtectedRoute from './components/nav/ProtectedRoute.jsx'
 import LandingPage from './pages/Landing.jsx'
 import AuthPage from './pages/Auth.jsx'
+import NotFoundPage from './pages/404.jsx'
+import { Toaster } from 'react-hot-toast'
 
 function App() {
   const [darkMode] = useDarkMode()
@@ -28,11 +30,16 @@ function App() {
         </ProtectedRoute>
       ),
     },
+    {
+      path: '*',
+      element: <NotFoundPage />,
+    },
   ])
 
   return (
     <main className={`${darkMode ? 'dark' : ''} text-foreground bg-background`}>
       <RouterProvider router={router} />
+      <Toaster />
     </main>
   )
 }

@@ -2,6 +2,7 @@ import {
   Button,
   Card,
   CardBody,
+  Divider,
   Dropdown,
   DropdownItem,
   DropdownMenu,
@@ -117,6 +118,7 @@ function Sidebar() {
         })}
       </nav>
       <div className="flex flex-col gap-6">
+        <Divider />
         <Card shadow="none" className="b">
           <CardBody>
             <div className="flex items-center justify-between mb-2">

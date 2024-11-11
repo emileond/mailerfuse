@@ -17,7 +17,7 @@ export default function NavBar() {
   const { data: user } = useUser()
   const menuItems = [
     {
-      name: 'Fetures',
+      name: 'Features',
       href: '#',
     },
     {

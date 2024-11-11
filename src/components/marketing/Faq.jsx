@@ -57,7 +57,7 @@ export default function Faq() {
   ]
 
   return (
-    <div className="mx-auto max-w-4xl py-32">
+    <div className="mx-auto max-w-3xl py-32">
       <div className="flex flex-col gap-3 justify-center items-center">
         <h4 className="text-2xl font-bold sm:text-3xl">FAQ</h4>
         <p className="max-w-xl text-muted-foreground text-center mb-9">
@@ -65,7 +65,7 @@ export default function Faq() {
         </p>
       </div>
       <div className="w-full">
-        <Accordion fullWidth selectionMode="multiple" variant="splitted">
+        <Accordion fullWidth selectionMode="multiple" variant="light">
           {accordionItems.map((item, index) => (
             <AccordionItem
               key={index}

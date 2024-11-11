@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Input, Button, Link } from '@nextui-org/react'
+import { Link as RouterLink } from 'react-router-dom'
 import { PiWarningBold } from 'react-icons/pi'
 import {
   useRegisterUser,
@@ -100,7 +101,9 @@ function AuthForm({ viewMode = 'signup' }) {
   }
   return (
     <div>
-      <Logo size="10" />
+      <RouterLink to="/">
+        <Logo size="10" />
+      </RouterLink>
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="min-w-96 flex flex-col gap-4 py-8"
