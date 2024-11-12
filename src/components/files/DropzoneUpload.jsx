@@ -28,7 +28,7 @@ const DropzoneUpload = () => {
   return (
     <div
       {...getRootProps()}
-      className={`min-h-60 flex flex-col items-center justify-center border-2 border-dashed border-default-200 rounded-lg p-6 cursor-pointer hover:bg-default-100 ${
+      className={`min-h-60 flex flex-col items-center justify-center border-2 border-dashed border-default-200 rounded-lg p-6 cursor-pointer hover:bg-content2 ${
         isDragActive ? 'bg-primary-200' : 'bg-content1'
       }`}
     >
