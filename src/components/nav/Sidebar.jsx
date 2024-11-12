@@ -11,7 +11,7 @@ function Sidebar() {
     <div className="basis-64 grow-0 shrink-0 h-screen bg-content1 p-6 flex flex-col justify-between border-r-1 border-default-200">
       <nav className="w-full flex flex-col items-start gap-1">
         <div className="px-6 mb-6">
-          <Logo size="10" />
+          <Logo />
         </div>
         {navItems.map((route, index) => {
           const isActive = route.path === location.pathname
@@ -26,8 +26,8 @@ function Sidebar() {
                 !isActive && 'text-default-600'
               }`}
               size="lg"
-              color={isActive ? 'secondary' : 'default'}
-              variant={isActive ? 'faded' : 'light'}
+              color={isActive ? 'primary' : 'default'}
+              variant={isActive ? 'flat' : 'light'}
             >
               {route.name}
             </Button>

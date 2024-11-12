@@ -5,7 +5,7 @@ import logo from '/logo.svg'
 import icon from '/icon.svg'
 import darkLogo from '/logo-dark.svg'
 
-function Logo({ isIconOnly = false, size = '9' }) {
+function Logo({ isIconOnly = false, size = '6' }) {
   const [darkMode] = useDarkMode()
   const [src, setSrc] = useState(isIconOnly ? icon : logo)
 

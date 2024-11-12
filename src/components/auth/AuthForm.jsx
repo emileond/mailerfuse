@@ -101,7 +101,7 @@ function AuthForm({ viewMode = 'signup' }) {
   return (
     <div>
       <RouterLink to="/">
-        <Logo size="10" />
+        <Logo />
       </RouterLink>
       <form
         onSubmit={handleSubmit(onSubmit)}
