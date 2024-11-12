@@ -3,54 +3,62 @@ import { Accordion, AccordionItem } from '@nextui-org/accordion'
 export default function Faq() {
   const accordionItems = [
     {
-      title: 'This template is Free?',
+      title: 'What is the purpose of an email verifier?',
       content: (
         <div className="text-muted-foreground">
-          Yes, this template is free. You can use it for personal or commercial
-          purposes.
+          An email verifier helps ensure that the email addresses on your list
+          are real and active. This improves your email deliverability, protects
+          your sender reputation, and reduces bounces.
         </div>
       ),
     },
     {
-      title: 'There are more templates?',
+      title: 'How do you validate email addresses?',
       content: (
         <div className="text-muted-foreground">
-          Yes, there are more templates available. You can find them here:{' '}
-          <a
-            href="https://x.com/gonzalochale"
-            target="_blank"
-            rel="noreferrer"
-            className="text-primary underline"
-          >
-            gonzalochale.dev
-          </a>
+          We validate each email without sending a message by doing critical
+          checks like spotting typos, filtering out disposable addresses, and
+          confirming domain records. Plus, other background checks to ensure the
+          email is deliverable.
         </div>
       ),
     },
     {
-      title: 'How can I use this template?',
+      title: 'Can an email sent to a "verified" address bounce?',
       content: (
         <div className="text-muted-foreground">
-          You can use this template by cloning it from{' '}
-          <a
-            href="https://github.com/gonzalochale/nextui-saas-landing-template"
-            className="text-primary underline"
-            target="_blank"
-            rel="noreferrer"
-          >
-            GitHub
-          </a>
-          .
+          Yes, it’s still possible, but the chances are much lower compared to
+          sending emails without verification. Our service minimizes bounces to
+          help keep your sender reputation healthy.
         </div>
       ),
     },
     {
-      title: 'How can I contribute to this template?',
+      title: 'Can I validate a list of email addresses?',
       content: (
         <div className="text-muted-foreground">
-          You can contribute to this template by forking it on GitHub and
-          submitting a pull request. You can also report any issues or bugs you
-          encounter while using the template.
+          Absolutely! You can upload your entire email list and get it validated
+          in bulk, making it quick and easy to clean up your contacts.
+        </div>
+      ),
+    },
+    {
+      title: 'Do I need to use an API?',
+      content: (
+        <div className="text-muted-foreground">
+          Nope! You can upload your lists directly through our portal or use our
+          integrations to connect with your email marketing platform. The API is
+          optional, and it’s only necessary if you want to validate email
+          addresses in real time on your website or app.
+        </div>
+      ),
+    },
+    {
+      title: 'Is the Email Verifier free?',
+      content: (
+        <div className="text-muted-foreground">
+          Yes, we offer 250 free verifications every month. After that, it’s
+          just $0.003 per credit, and your credits never expire.
         </div>
       ),
     },
@@ -59,10 +67,9 @@ export default function Faq() {
   return (
     <div className="mx-auto max-w-3xl py-32">
       <div className="flex flex-col gap-3 justify-center items-center">
-        <h4 className="text-2xl font-bold sm:text-3xl">FAQ</h4>
-        <p className="max-w-xl text-muted-foreground text-center mb-9">
-          Here are some of our frequently asked questions.
-        </p>
+        <h4 className="text-2xl font-bold sm:text-3xl mb-9">
+          Frequently Asked Questions
+        </h4>
       </div>
       <div className="w-full">
         <Accordion fullWidth selectionMode="multiple" variant="light">
@@ -71,9 +78,11 @@ export default function Faq() {
               key={index}
               aria-label={item.title}
               title={item.title}
-              className="text-muted-foreground"
+              className="font-medium "
             >
-              {item.content}
+              <p className="font-normal text-default-700 text-md text-pretty pt-3 pb-6">
+                {item.content}
+              </p>
             </AccordionItem>
           ))}
         </Accordion>

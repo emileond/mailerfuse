@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import { Button } from '@nextui-org/react'
+import { Button, Image } from '@nextui-org/react'
 
 function Feature({ heading, description, ctaText, imageUrl, reverse = false }) {
   Feature.propTypes = {
@@ -17,10 +17,11 @@ function Feature({ heading, description, ctaText, imageUrl, reverse = false }) {
     >
       {/* Image Section */}
       <div className="w-full md:w-1/2">
-        <img
+        <Image
+          isBlurred
           src={imageUrl}
           alt={heading}
-          className="w-full h-auto rounded-lg shadow-md"
+          className="w-full h-auto rounded-lg"
         />
       </div>
 

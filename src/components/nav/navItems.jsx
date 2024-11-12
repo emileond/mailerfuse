@@ -6,7 +6,7 @@ import {
   RiSettingsLine,
 } from 'react-icons/ri'
 
-const ICON_SIZE = 24 // Adjust the icon size as needed
+const ICON_SIZE = '1.2rem'
 
 export const navItems = [
   {

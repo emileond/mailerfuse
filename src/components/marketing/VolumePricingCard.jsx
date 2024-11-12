@@ -59,8 +59,8 @@ function VolumePricingCard() {
   }
   return (
     <div className="flex flex-col gap-9">
-      <h3 className="text-xl font-semibold text-center">
-        How many emails do you want to validate?
+      <h3 className="text-xl font-semibold text-center text-default-700">
+        How many emails do you need to validate?
       </h3>
       <Slider
         step={1}
@@ -110,7 +110,7 @@ function VolumePricingCard() {
           },
         ]}
         defaultValue={1}
-        className="w-full"
+        className="w-full mb-9"
         onChange={(v) => handleChange(v)}
       />
       <div className="flex flex-wrap justify-center">
@@ -137,7 +137,7 @@ function VolumePricingCard() {
                   <span className="text-xl text-success">
                     {<RiCheckFill />}
                   </span>
-                  <p className="font-medium text-default-500">{feature}</p>
+                  <p className="font-medium text-default-600">{feature}</p>
                 </div>
               ))}
             </div>

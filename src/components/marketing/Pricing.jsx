@@ -9,8 +9,8 @@ function Pricing({ volumePricing = false }) {
 
   return (
     <div className="w-full max-w-5xl mx-auto py-32 px-6 flex flex-col gap-9">
-      <h2 className="text-3xl font-bold text-center mb-3">
-        Simple, transparent pricing
+      <h2 className="text-3xl font-bold text-center">
+        Pay Only for What You Use
       </h2>
       {volumePricing ? <VolumePricingCard /> : <PricingPlans />}
 
