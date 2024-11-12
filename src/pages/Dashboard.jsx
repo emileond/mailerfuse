@@ -8,11 +8,13 @@ import {
 } from '@nextui-org/react'
 import AppLayout from '../components/layout/AppLayout'
 import PageLayout from '../components/layout/PageLayout'
+import DropzoneUpload from '../components/files/DropzoneUpload'
 
 function DashboardPage() {
   return (
     <AppLayout>
       <PageLayout onClick={() => console.log('clicked')}>
+        <DropzoneUpload />
         <Table aria-label="Example static collection table">
           <TableHeader>
             <TableColumn>NAME</TableColumn>

@@ -22,9 +22,11 @@ function Sidebar() {
               key={index}
               to={route.path}
               startContent={route?.startContent}
-              className="items-center justify-start w-full text-default-600"
+              className={`items-center justify-start w-full ${
+                !isActive && 'text-default-600'
+              }`}
               size="lg"
-              color={isActive ? 'secondary' : 'default'}
+              color={isActive ? 'primary' : 'default'}
               variant={isActive ? 'flat' : 'light'}
             >
               {route.name}

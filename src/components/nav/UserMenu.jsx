@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import {
   Avatar,
   Button,
@@ -23,6 +24,9 @@ import { useLogout } from '../../hooks/react-query/user/useUser'
 import { Link } from 'react-router-dom'
 
 function UserMenu({ avatarOnly }) {
+  UserMenu.propTypes = {
+    avatarOnly: PropTypes.bool,
+  }
   const [darkMode, setDarkMode] = useDarkMode()
   const { data: user } = useUser()
   const { mutateAsync: logoutUser } = useLogout()
