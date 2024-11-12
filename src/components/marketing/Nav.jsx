@@ -57,31 +57,31 @@ export default function NavBar() {
       </NavbarContent>
       <NavbarContent justify="end">
         {user ? (
-          <NavbarItem className="hidden sm:flex">
+          <NavbarItem className="sm:flex">
             <Button
               as={Link}
               color="primary"
               to="/dashboard"
               variant="solid"
-              className="hidden sm:flex"
+              className="sm:flex"
             >
               Dashboard
             </Button>
           </NavbarItem>
         ) : (
           <div className="flex gap-3">
-            <NavbarItem className="hidden sm:flex">
+            <NavbarItem className="sm:flex">
               <Button
                 as={Link}
                 color="default"
                 to="/login"
                 variant="light"
-                className="hidden sm:flex"
+                className="sm:flex"
               >
                 Login
               </Button>
             </NavbarItem>
-            <NavbarItem className="hidden sm:flex">
+            <NavbarItem className="sm:flex">
               <Button
                 as={Link}
                 color="primary"
@@ -94,7 +94,7 @@ export default function NavBar() {
             </NavbarItem>
           </div>
         )}
-        <NavbarItem>
+        <NavbarItem className="hidden sm:flex">
           <ThemeSwitcher />
         </NavbarItem>
       </NavbarContent>

@@ -41,7 +41,6 @@ function AuthForm({ viewMode = 'signup' }) {
       const disposableDomains = await response.json()
       const domain = email.split('@')[1]
       const isValid = !disposableDomains.includes(domain)
-      console.log(isValid) // This should log correctly
 
       return isValid // This ensures the value is returned to the caller
     } catch (error) {

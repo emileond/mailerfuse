@@ -41,9 +41,9 @@ export const useLoginUser = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: loginUser,
-    onSuccess: (data) => {
-      queryClient.setQueryData('currentUser', data)
-      window.location.replace('/') // Redirect after login
+    onSuccess: async (data) => {
+      await queryClient.invalidateQueries({ queryKey: ['currentUser'] })
+      await queryClient.setQueryData('currentUser', data)
     },
   })
 }
@@ -52,8 +52,8 @@ export const useLogout = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: logoutUser,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['currentUser'] })
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['currentUser'] })
     },
   })
 }
@@ -62,8 +62,9 @@ export const useRegisterUser = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: registerUser,
-    onSuccess: (data) => {
-      queryClient.setQueryData('currentUser', data)
+    onSuccess: async (data) => {
+      await queryClient.invalidateQueries({ queryKey: ['currentUser'] })
+      await queryClient.setQueryData('currentUser', data)
     },
   })
 }
