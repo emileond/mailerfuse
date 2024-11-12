@@ -26,8 +26,8 @@ function Sidebar() {
                 !isActive && 'text-default-600'
               }`}
               size="lg"
-              color={isActive ? 'primary' : 'default'}
-              variant={isActive ? 'flat' : 'light'}
+              color={isActive ? 'secondary' : 'default'}
+              variant={isActive ? 'faded' : 'light'}
             >
               {route.name}
             </Button>

@@ -47,7 +47,7 @@ const DropzoneUpload = () => {
               Drag & drop some files here
             </p>
           </div>
-          <Button color="primary" variant="ghost">
+          <Button color="primary" variant="light">
             Select Files
           </Button>
         </div>
