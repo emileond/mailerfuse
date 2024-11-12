@@ -30,7 +30,7 @@ export default function NavBar() {
     },
   ]
   return (
-    <Navbar maxWidth="xl" className="bg-content1">
+    <Navbar maxWidth="xl">
       <NavbarContent className="sm:hidden" justify="start">
         <NavbarMenuToggle />
       </NavbarContent>
