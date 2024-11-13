@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { databases, ID, Permission, Role } from '../../../lib/appwrite'
 
 // Fetch email lists for a specific team
-const fetchEmailLists = async (teamId) => {
+const fetchEmailLists = async () => {
   const result = await databases.listDocuments(
     '672b9b260032fe4d52ef',
     '672c0483001ea19aa498',
@@ -50,6 +50,32 @@ export const useCreateEmailList = () => {
     onSuccess: (newList, { teamId }) => {
       // Invalidate and refetch the email lists query for the team
       queryClient.invalidateQueries(['emailLists', teamId])
+    },
+  })
+}
+
+// Function to delete an email list
+const deleteEmailList = async ({ listId }) => {
+  await databases.deleteDocument(
+    '672b9b260032fe4d52ef',
+    '672c0483001ea19aa498',
+    listId
+  )
+  return
+}
+
+// Hook to delete an email list
+export const useDeleteEmailList = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: deleteEmailList,
+    onError: (error) => {
+      console.error('Error deleting email list:', error)
+    },
+    onSuccess: () => {
+      // Invalidate and refetch the email lists query for the team
+      queryClient.invalidateQueries(['emailLists'])
     },
   })
 }

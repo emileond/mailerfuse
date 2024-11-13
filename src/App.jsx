@@ -8,6 +8,7 @@ import NotFoundPage from './pages/404.jsx'
 import { Toaster } from 'react-hot-toast'
 import { Progress } from '@nextui-org/react'
 import { useUser } from './hooks/react-query/user/useUser.js'
+import ListDetailsPage from './pages/ListDetailsPage.jsx'
 
 function App() {
   const { isLoading } = useUser()
@@ -31,6 +32,14 @@ function App() {
       element: (
         <ProtectedRoute>
           <DashboardPage />
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: '/lists/:id', // Dynamic route with "id" as the parameter
+      element: (
+        <ProtectedRoute>
+          <ListDetailsPage />
         </ProtectedRoute>
       ),
     },
