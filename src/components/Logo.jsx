@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import PropTypes from 'prop-types'
 import { useDarkMode } from '../hooks/theme/useDarkMode'
 import logo from '/logo.svg'
 import icon from '/icon.svg'
@@ -20,11 +19,6 @@ function Logo({ isIconOnly = false, size = '6' }) {
   }, [darkMode, isIconOnly])
 
   return <img src={src} alt="logo" className={`h-${size} w-auto`} />
-}
-
-Logo.propTypes = {
-  isIconOnly: PropTypes.bool,
-  size: PropTypes.string,
 }
 
 export default Logo

@@ -4,24 +4,57 @@ import { Button } from '@nextui-org/react'
 import toast from 'react-hot-toast'
 import { useDarkMode } from '../../hooks/theme/useDarkMode'
 
-const DropzoneUpload = () => {
+const DropzoneUpload = ({
+  onUpload,
+  acceptedTypes = { 'text/csv': [] },
+  maxFiles = 1,
+}) => {
   const [darkMode] = useDarkMode()
 
   const imgFolder = darkMode ? 'dark' : 'light'
-  const onDrop = useCallback((acceptedFiles) => {
-    console.log(acceptedFiles)
-    // Handle the uploaded files here
-  }, [])
+
+  const onDrop = useCallback(
+    (acceptedFiles) => {
+      if (onUpload) {
+        // Use FileReader to read each file as text
+        acceptedFiles.forEach((file) => {
+          const fileName = file?.name
+          const reader = new FileReader()
+          reader.onload = (event) => {
+            const fileContent = event.target.result
+            // Do something with the file content, e.g., pass it to the onUpload callback
+            onUpload({ fileName, fileContent })
+          }
+          reader.onerror = () => {
+            toast.error('Failed to read the file content')
+          }
+          reader.readAsText(file) // Ensure the file is passed as a Blob
+        })
+      }
+    },
+    [onUpload]
+  )
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    maxFiles: maxFiles,
     onDrop,
-    accept: {
-      'image/*': [], // Customize accepted file types
-    },
-    onDropRejected: () => {
-      toast.error(
-        'The file type you are trying to upload is not supported. Supported file types are: .csv,.txt,.xlsx,.xls'
-      )
+    accept: acceptedTypes,
+    onDropRejected: (errors) => {
+      const errorCode = errors[0]?.errors[0]?.code
+
+      if (errorCode === 'file-too-large') {
+        toast.error('File size is too large.')
+      } else if (errorCode === 'too-many-files') {
+        toast.error(
+          `You can only upload ${maxFiles} file${maxFiles > 1 ? 's' : ''}.`
+        )
+      } else if (errorCode === 'file-invalid-type') {
+        toast.error(
+          `The file type you are trying to upload is not supported. Supported file types are: ${
+            acceptedTypes ? Object?.keys(acceptedTypes)?.join(', ') : 'CSV'
+          }`
+        )
+      }
     },
   })
 

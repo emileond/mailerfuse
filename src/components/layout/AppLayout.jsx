@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import PropTypes from 'prop-types'
 import Sidebar from '../nav/Sidebar'
 import Appbar from '../nav/Appbar'
 
@@ -17,10 +16,6 @@ function AppLayout({ children }) {
 
     return () => window.removeEventListener('resize', handleResize)
   }, [])
-
-  AppLayout.propTypes = {
-    children: PropTypes.node,
-  }
 
   return (
     <div className={`flex ${!showSidebar && 'flex-col'} h-screen w-screen`}>

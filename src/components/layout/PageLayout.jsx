@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types'
 import { Button } from '@nextui-org/react'
 import { useNavigate } from 'react-router-dom'
 import { RiArrowLeftLine } from 'react-icons/ri'
@@ -12,16 +11,6 @@ function PageLayout({
   onClick,
   backBtn,
 }) {
-  PageLayout.propTypes = {
-    children: PropTypes.node,
-    maxW: PropTypes.string,
-    title: PropTypes.string,
-    primaryAction: PropTypes.string,
-    onClick: PropTypes.func,
-    icon: PropTypes.node,
-    backBtn: PropTypes.bool,
-  }
-
   const navigate = useNavigate()
 
   function handleOnclick() {

@@ -1,12 +1,8 @@
-import PropTypes from 'prop-types'
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useUser } from '../../hooks/react-query/user/useUser'
 
 function ProtectedRoute({ children }) {
-  ProtectedRoute.propTypes = {
-    children: PropTypes.node.isRequired,
-  }
   const { data: user } = useUser()
   const navigate = useNavigate()
 

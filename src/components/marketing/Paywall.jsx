@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types'
 import { cloneElement } from 'react'
 import {
   Modal,
@@ -14,11 +13,6 @@ import VolumePricingCard from './VolumePricingCard'
 import { Link } from 'react-router-dom'
 
 function Paywall({ trigger, feature, volumePricing = false }) {
-  Paywall.propTypes = {
-    trigger: PropTypes.element.isRequired,
-    feature: PropTypes.string.isRequired,
-    volumePricing: PropTypes.bool,
-  }
   const { isOpen, onOpen, onOpenChange } = useDisclosure()
 
   // Clone the trigger element and add the onClick handler

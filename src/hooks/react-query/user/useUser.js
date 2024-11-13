@@ -1,6 +1,5 @@
-import { ID } from 'appwrite'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { account } from '../../../lib/appwrite'
+import { ID, account, teams } from '../../../lib/appwrite'
 
 const fetchCurrentUser = async () => {
   try {
@@ -33,6 +32,11 @@ const registerUser = async ({ email, password }) => {
   await account.create(ID.unique(), email, password)
   await account.createEmailPasswordSession(email, password)
   await account.createVerification(import.meta.env.VITE_PUBLIC_URL)
+  // should move this after verification ???
+  const userTeams = await teams.list()
+  if (!userTeams.total) {
+    await teams.create(ID.unique(), 'My Team')
+  }
   return
 }
 

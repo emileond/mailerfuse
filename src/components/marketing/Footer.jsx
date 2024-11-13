@@ -1,6 +1,3 @@
-import { Button } from '@nextui-org/button'
-import { Link } from 'react-router-dom'
-
 const Footer = () => {
   return (
     <footer className="bg-content2 w-full px-4 py-16">

@@ -1,14 +1,6 @@
-import PropTypes from 'prop-types'
 import { Button, Image } from '@nextui-org/react'
 
 function Feature({ heading, description, ctaText, imageUrl, reverse = false }) {
-  Feature.propTypes = {
-    heading: PropTypes.string.isRequired,
-    description: PropTypes.string.isRequired,
-    ctaText: PropTypes.string.isRequired,
-    imageUrl: PropTypes.string.isRequired,
-    reverse: PropTypes.bool,
-  }
   return (
     <div
       className={`w-full max-w-6xl mx-auto py-32 px-6 flex flex-col ${

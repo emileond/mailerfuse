@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types'
 import {
   Button,
   Card,
@@ -17,14 +16,6 @@ function PricingCard({
   features,
   highlight = false,
 }) {
-  PricingCard.propTypes = {
-    name: PropTypes.string,
-    price: PropTypes.number,
-    yearlyPrice: PropTypes.number,
-    isYearly: PropTypes.bool,
-    features: PropTypes.array,
-    highlight: PropTypes.bool,
-  }
   return (
     <Card
       className={`basis-[200px] grow ${highlight && 'border-2 border-primary'}`}
