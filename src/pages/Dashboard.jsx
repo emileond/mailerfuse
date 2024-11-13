@@ -5,39 +5,36 @@ import {
   TableColumn,
   TableRow,
   TableCell,
+  Spinner,
+  Progress,
 } from '@nextui-org/react'
 import AppLayout from '../components/layout/AppLayout'
 import PageLayout from '../components/layout/PageLayout'
 import DropzoneUpload from '../components/files/DropzoneUpload'
 import { RiAddLine } from 'react-icons/ri'
 import Papa from 'papaparse'
-import { databases, ID } from '../lib/appwrite'
-import { useUser } from '../hooks/react-query/user/useUser'
+import { useTeams } from '../hooks/react-query/teams/useTeams'
+import {
+  useEmailLists,
+  useCreateEmailList,
+} from '../hooks/react-query/email-lists/useEmailLists'
 
 function DashboardPage() {
-  const { data: user } = useUser()
+  const { data: teams } = useTeams()
+  const teamId = teams?.teams[0]?.$id
 
-  console.log('usr', user)
-  async function saveList(fileName) {
-    const savedList = await databases.createDocument(
-      '672b9b260032fe4d52ef',
-      '672c0483001ea19aa498',
-      ID.unique(),
-      {
-        name: fileName,
-        status: 'pending',
-      }
-    )
-
-    console.log(savedList)
-  }
+  const { data: emailLists, isPending, isLoading } = useEmailLists(teamId)
+  const { mutateAync: createEmailList } = useCreateEmailList()
 
   async function handleParse(data) {
     // save file name without extension
     const fileName = data?.fileName?.split('.')[0]
 
     // save list to db
-    await saveList(fileName)
+    await createEmailList({
+      name: fileName,
+      teamId: teamId,
+    })
 
     // Parse the CSV
     Papa.parse(data?.fileContent, {
@@ -76,34 +73,30 @@ function DashboardPage() {
         icon={<RiAddLine fontSize="1.1rem" />}
         onClick={() => console.log('clicked')}
       >
-        <DropzoneUpload onUpload={handleParse} />
-        <Table aria-label="Example static collection table">
+        <Table aria-label="Email lists">
           <TableHeader>
             <TableColumn>NAME</TableColumn>
-            <TableColumn>ROLE</TableColumn>
+            <TableColumn>SIZE</TableColumn>
+            <TableColumn>Overview</TableColumn>
             <TableColumn>STATUS</TableColumn>
           </TableHeader>
-          <TableBody>
-            <TableRow key="1">
-              <TableCell>Tony Reichert</TableCell>
-              <TableCell>CEO</TableCell>
-              <TableCell>Active</TableCell>
-            </TableRow>
-            <TableRow key="2">
-              <TableCell>Zoey Lang</TableCell>
-              <TableCell>Technical Lead</TableCell>
-              <TableCell>Paused</TableCell>
-            </TableRow>
-            <TableRow key="3">
-              <TableCell>Jane Fisher</TableCell>
-              <TableCell>Senior Developer</TableCell>
-              <TableCell>Active</TableCell>
-            </TableRow>
-            <TableRow key="4">
-              <TableCell>William Howard</TableCell>
-              <TableCell>Community Manager</TableCell>
-              <TableCell>Vacation</TableCell>
-            </TableRow>
+          <TableBody
+            isLoading={isPending}
+            loadingContent={<Spinner label="Loading..." />}
+            emptyContent={<DropzoneUpload onUpload={handleParse} />}
+          >
+            {emailLists?.map((list) => (
+              <TableRow key={list.$id}>
+                <TableCell className="min-w-[100px] max-w-[120px] whitespace-nowrap text-ellipsis overflow-hidden">
+                  {list?.name}
+                </TableCell>
+                <TableCell>2</TableCell>
+                <TableCell>
+                  <Progress />
+                </TableCell>
+                <TableCell>{list?.status}</TableCell>
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
       </PageLayout>

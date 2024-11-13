@@ -9,4 +9,4 @@ client
 export const account = new Account(client)
 export const databases = new Databases(client)
 export const teams = new Teams(client)
-export { ID } from 'appwrite'
+export { ID, Permission, Role } from 'appwrite'

@@ -57,7 +57,7 @@ export const useLogout = () => {
   return useMutation({
     mutationFn: logoutUser,
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['currentUser'] })
+      await queryClient.invalidateQueries()
     },
   })
 }
