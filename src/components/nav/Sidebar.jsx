@@ -3,6 +3,8 @@ import { Link, useLocation } from 'react-router-dom'
 import Logo from '../Logo'
 import { navItems } from './navItems'
 import UserMenu from './UserMenu'
+import WorkspaceSwitcher from './WorkspaceSwitcher'
+import WorkspaceUsageCard from '../marketing/WorkspaceUsageCard'
 
 function Sidebar() {
   const location = useLocation()
@@ -10,9 +12,11 @@ function Sidebar() {
   return (
     <div className="basis-64 grow-0 shrink-0 h-screen bg-content1 p-6 flex flex-col justify-between border-r-1 border-default-200">
       <nav className="w-full flex flex-col items-start gap-1">
-        <div className="px-6 mb-6">
+        <div className="px-6">
           <Logo />
         </div>
+        <Divider className="my-6" />
+        <WorkspaceSwitcher />
         {navItems.map((route, index) => {
           const isActive = route.path === location.pathname
 
@@ -36,24 +40,7 @@ function Sidebar() {
       </nav>
       <div className="flex flex-col gap-6">
         <Divider />
-        <Card shadow="none" className="b">
-          <CardBody>
-            <div className="flex items-center justify-between mb-2">
-              <span className="font-medium text-sm">Plan</span>
-              <Button
-                as={Link}
-                to="/pricing"
-                size="sm"
-                color="secondary"
-                variant="light"
-                className="p-1 font-semibold"
-              >
-                Upgrade
-              </Button>
-            </div>
-            <Progress size="sm" value={50} color="secondary" />
-          </CardBody>
-        </Card>
+        <WorkspaceUsageCard />
         <UserMenu />
       </div>
     </div>

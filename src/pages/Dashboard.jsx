@@ -18,27 +18,32 @@ import AppLayout from '../components/layout/AppLayout'
 import PageLayout from '../components/layout/PageLayout'
 import DropzoneUpload from '../components/files/DropzoneUpload'
 import { RiAddLine, RiMore2Fill, RiDeleteBin6Line } from 'react-icons/ri'
+import useCurrentWorkspace from '../hooks/useCurrentWorkspace'
 import Papa from 'papaparse'
-import { useTeams } from '../hooks/react-query/teams/useTeams'
 import {
   useEmailLists,
-  useCreateEmailList,
   useDeleteEmailList,
 } from '../hooks/react-query/email-lists/useEmailLists'
 import { useNavigate } from 'react-router-dom'
+import { useQueryClient } from '@tanstack/react-query'
+import ky from 'ky'
+import { supabaseClient } from '../lib/supabase'
+import toast from 'react-hot-toast'
 
 function DashboardPage() {
+  const [currentWorkspace] = useCurrentWorkspace()
   const navigate = useNavigate()
-  const { data: teams } = useTeams()
-  const teamId = teams?.teams[0]?.$id
+  const queryClient = useQueryClient()
 
-  const { data: emailLists, isPending, isFetching } = useEmailLists(teamId)
-
-  const { mutateAsync: createEmailList } = useCreateEmailList()
-  const { mutateAsync: deleteEmailList } = useDeleteEmailList()
+  const {
+    data: emailLists,
+    isPending,
+    isFetching,
+  } = useEmailLists(currentWorkspace)
+  const { mutateAsync: deleteEmailList } = useDeleteEmailList(currentWorkspace)
 
   async function handleDelete(listId) {
-    await deleteEmailList({ listId, teams })
+    await deleteEmailList({ listId })
   }
 
   async function handleParse(data) {
@@ -49,6 +54,7 @@ function DashboardPage() {
     Papa.parse(data?.fileContent, {
       header: true,
       complete: async (results) => {
+        const data = results.data
         const firstRow = results.data[0] // Access the first row of parsed data
 
         // Use a regular expression to match email addresses
@@ -64,19 +70,37 @@ function DashboardPage() {
         }
 
         if (emailColumn) {
-          // save list to db
-          const listResult = await createEmailList({
-            fileName,
-            teamId,
-          })
+          try {
+            const { data: session } = await supabaseClient.auth.getSession()
+            await ky
+              .post('/api/save-list', {
+                json: {
+                  fileName,
+                  data,
+                  emailColumn,
+                  workspace_id: currentWorkspace?.workspace_id,
+                  session: session?.session,
+                },
+              })
+              .json()
+          } catch (error) {
+            console.log(error)
+            if (error.response) {
+              // If you want to inspect the response details (e.g., status code)
+              const errorData = await error.response.json()
 
-          if (listResult?.$id) {
-            console.log('listResult', listResult)
+              // Example: Check for custom error code
+              if (errorData.error_code === 'INSUFFICIENT_CREDITS') {
+                toast('Not enough credits', {
+                  type: 'error',
+                  duration: 5000,
+                })
+              }
+            }
           }
-          console.log(`Email column identified: ${emailColumn}`)
-          // save list to db
-          // then saver emails to db
-          // then trigger validation
+          await queryClient.invalidateQueries({
+            queryKey: ['emailLists', currentWorkspace?.workspace_id],
+          })
         } else {
           console.log('No email column found')
         }
@@ -109,11 +133,11 @@ function DashboardPage() {
             emptyContent={<DropzoneUpload onUpload={handleParse} />}
           >
             {emailLists?.map((list) => (
-              <TableRow key={list.$id} className="cursor-pointer">
+              <TableRow key={list.id} className="cursor-pointer">
                 <TableCell className="min-w-[100px] max-w-[120px] whitespace-nowrap text-ellipsis overflow-hidden">
                   {list?.name}
                 </TableCell>
-                <TableCell>2</TableCell>
+                <TableCell>{list?.size}</TableCell>
                 <TableCell>
                   <Progress />
                 </TableCell>
@@ -143,7 +167,7 @@ function DashboardPage() {
                         className="text-danger"
                         color="danger"
                         startContent={<RiDeleteBin6Line fontSize="1.1rem" />}
-                        onClick={() => handleDelete(list?.$id)}
+                        onClick={() => handleDelete(list?.id)}
                       >
                         Delete
                       </DropdownItem>

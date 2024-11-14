@@ -1,6 +1,6 @@
 import { configure, tasks } from '@trigger.dev/sdk/v3'
 
-export async function onRequest(context) {
+export async function onRequestPost(context) {
   configure({
     secretKey: context.env.TRIGGER_SECRET_KEY,
   })

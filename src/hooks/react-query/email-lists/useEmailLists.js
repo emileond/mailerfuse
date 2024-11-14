@@ -1,81 +1,90 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { databases, ID, Permission, Role } from '../../../lib/appwrite'
+import { supabaseClient } from '../../../lib/supabase'
 
 // Fetch email lists for a specific team
-const fetchEmailLists = async () => {
-  const result = await databases.listDocuments(
-    '672b9b260032fe4d52ef',
-    '672c0483001ea19aa498',
-    [] // Add any necessary queries or filters here
-  )
-  return result.documents
+const fetchEmailLists = async (workspace_id) => {
+  const { data, error } = await supabaseClient
+    .from('lists')
+    .select('*')
+    .eq('workspace_id', workspace_id)
+
+  if (error) {
+    throw new Error('Failed to fetch email lists')
+  }
+
+  return data
 }
 
 // Hook to fetch all email lists for a given team
-export const useEmailLists = (teamId) => {
+export const useEmailLists = (currentWorkspace) => {
   return useQuery({
-    queryKey: ['emailLists', teamId],
-    queryFn: () => fetchEmailLists(teamId),
+    queryKey: ['emailLists', currentWorkspace?.workspace_id],
+    queryFn: () => fetchEmailLists(currentWorkspace?.workspace_id),
     staleTime: 1000 * 60 * 5, // 5 minutes
-    cacheTime: 1000 * 60 * 5, // Cache for 5 minutes
-    enabled: !!teamId, // Only fetch if teamId is provided
+    enabled: !!currentWorkspace?.workspace_id, // Only fetch if teamId is provided
   })
 }
 
 // Function to create a new email list
-const createEmailList = async ({ fileName, teamId }) => {
-  const savedList = await databases.createDocument(
-    '672b9b260032fe4d52ef',
-    '672c0483001ea19aa498',
-    ID.unique(),
+const createEmailList = async ({ fileName, workspace_id }) => {
+  const { error } = await supabaseClient.from('lists').insert([
     {
       name: fileName,
       status: 'pending',
+      workspace_id: workspace_id,
     },
-    [
-      Permission.read(Role.team(teamId)),
-      Permission.update(Role.team(teamId)),
-      Permission.delete(Role.team(teamId)),
-    ]
-  )
-  return savedList
+  ])
+
+  if (error) {
+    throw new Error('Failed to create email list')
+  }
+
+  return
 }
 
 // Hook to create a new email list
-export const useCreateEmailList = () => {
+export const useCreateEmailList = (currentWorkspace) => {
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: createEmailList,
-    onSuccess: (newList, { teamId }) => {
+    onSuccess: () => {
       // Invalidate and refetch the email lists query for the team
-      queryClient.invalidateQueries(['emailLists', teamId])
+      queryClient.invalidateQueries([
+        'emailLists',
+        currentWorkspace?.workspace_id,
+      ])
     },
   })
 }
 
 // Function to delete an email list
 const deleteEmailList = async ({ listId }) => {
-  await databases.deleteDocument(
-    '672b9b260032fe4d52ef',
-    '672c0483001ea19aa498',
-    listId
-  )
+  console.log('delete listId', listId)
+  const { error } = await supabaseClient.from('lists').delete().eq('id', listId)
+
+  if (error) {
+    throw new Error('Failed to delete email list')
+  }
+
   return
 }
 
 // Hook to delete an email list
-export const useDeleteEmailList = () => {
+export const useDeleteEmailList = (currentWorkspace) => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: deleteEmailList,
+    mutationFn: ({ listId }) => deleteEmailList({ listId }),
     onError: (error) => {
       console.error('Error deleting email list:', error)
     },
     onSuccess: () => {
       // Invalidate and refetch the email lists query for the team
-      queryClient.invalidateQueries(['emailLists'])
+      queryClient.invalidateQueries([
+        'emailLists',
+        currentWorkspace?.workspace_id,
+      ])
     },
   })
 }

@@ -6,7 +6,7 @@ function PageLayout({
   children,
   maxW = '6xl',
   title = 'Page',
-  primaryAction = 'Click me',
+  primaryAction,
   icon,
   onClick,
   backBtn,
@@ -20,7 +20,7 @@ function PageLayout({
   }
 
   return (
-    <div className={`bg-content1 p-6 grow flex justify-center`}>
+    <div className={`bg-content1 px-6 py-9 grow flex justify-center`}>
       <div className={`w-full max-w-${maxW} flex flex-col gap-6 `}>
         <div className="w-full flex justify-between gap-3">
           <div className="flex gap-3">
@@ -31,14 +31,16 @@ function PageLayout({
             )}
             <h1 className="font-semibold">{title}</h1>
           </div>
-          <Button
-            onClick={handleOnclick}
-            color="primary"
-            className="font-medium"
-            startContent={icon}
-          >
-            {primaryAction}
-          </Button>
+          {primaryAction && (
+            <Button
+              onClick={handleOnclick}
+              color="primary"
+              className="font-medium"
+              startContent={icon}
+            >
+              {primaryAction}
+            </Button>
+          )}
         </div>
         <div>{children}</div>
       </div>

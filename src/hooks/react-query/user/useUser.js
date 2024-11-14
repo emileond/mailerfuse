@@ -1,13 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { ID, account, teams } from '../../../lib/appwrite'
+import { supabaseClient } from '../../../lib/supabase'
 
 const fetchCurrentUser = async () => {
-  try {
-    const data = await account.get()
-    return data
-  } catch {
-    return null
-  }
+  const {
+    data: { user },
+  } = await supabaseClient.auth.getUser()
+
+  return user
 }
 
 export const useUser = () => {
@@ -20,24 +19,32 @@ export const useUser = () => {
 }
 // Functions for login, logout, and register
 const loginUser = async ({ email, password }) => {
-  const user = await account.createEmailPasswordSession(email, password)
-  return user
+  let { data, error } = await supabaseClient.auth.signInWithPassword({
+    email: email,
+    password: password,
+  })
+
+  if (error) {
+    throw new Error(error.message)
+  }
+  return data.user
 }
 
 const logoutUser = async () => {
-  await account.deleteSession('current')
+  await supabaseClient.auth.signOut()
 }
 
 const registerUser = async ({ email, password }) => {
-  await account.create(ID.unique(), email, password)
-  await account.createEmailPasswordSession(email, password)
-  await account.createVerification(import.meta.env.VITE_PUBLIC_URL)
-  // should move this after verification ???
-  const userTeams = await teams.list()
-  if (!userTeams.total) {
-    await teams.create(ID.unique(), 'My Team')
+  const { data, error } = await supabaseClient.auth.signUp({
+    email,
+    password,
+  })
+
+  if (error) {
+    throw new Error(error.message)
   }
-  return
+
+  return data.user
 }
 
 // Hooks for mutations
@@ -63,12 +70,10 @@ export const useLogout = () => {
 }
 
 export const useRegisterUser = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: registerUser,
-    onSuccess: async (data) => {
-      await queryClient.invalidateQueries({ queryKey: ['currentUser'] })
-      await queryClient.setQueryData('currentUser', data)
+    onSuccess: async () => {
+      return true
     },
   })
 }

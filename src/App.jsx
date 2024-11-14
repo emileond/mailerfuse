@@ -9,11 +9,14 @@ import { Toaster } from 'react-hot-toast'
 import { Progress } from '@nextui-org/react'
 import { useUser } from './hooks/react-query/user/useUser.js'
 import ListDetailsPage from './pages/ListDetailsPage.jsx'
+import OnboardingPage from './pages/Onboarding.jsx'
+import { useState } from 'react'
+import CurrentWorkspaceContext from './context/currentWorkspace.js'
 
 function App() {
   const { isLoading } = useUser()
-
   const [darkMode] = useDarkMode()
+  const [currentWorkspace, setCurrentWorkspace] = useState(null)
   const router = createBrowserRouter([
     {
       path: '/',
@@ -36,6 +39,14 @@ function App() {
       ),
     },
     {
+      path: '/onboarding',
+      element: (
+        <ProtectedRoute>
+          <OnboardingPage />
+        </ProtectedRoute>
+      ),
+    },
+    {
       path: '/lists/:id', // Dynamic route with "id" as the parameter
       element: (
         <ProtectedRoute>
@@ -51,9 +62,13 @@ function App() {
 
   return (
     <main className={`${darkMode ? 'dark' : ''} text-foreground bg-background`}>
-      {isLoading && <Progress size="sm" isIndeterminate />}
-      <RouterProvider router={router} />
-      <Toaster />
+      <CurrentWorkspaceContext.Provider
+        value={[currentWorkspace, setCurrentWorkspace]}
+      >
+        {isLoading && <Progress size="sm" isIndeterminate />}
+        <RouterProvider router={router} />
+        <Toaster position="bottom-center" />
+      </CurrentWorkspaceContext.Provider>
     </main>
   )
 }
