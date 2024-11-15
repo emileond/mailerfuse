@@ -21,8 +21,10 @@ import { useDarkMode } from '../../hooks/theme/useDarkMode'
 import { useUser } from '../../hooks/react-query/user/useUser'
 import { useLogout } from '../../hooks/react-query/user/useUser'
 import { Link } from 'react-router-dom'
+import { useQueryClient } from '@tanstack/react-query'
 
 function UserMenu({ avatarOnly }) {
+  const queryClient = useQueryClient()
   const [darkMode, setDarkMode] = useDarkMode()
   const { data: user } = useUser()
   const { mutateAsync: logoutUser } = useLogout()
@@ -32,6 +34,8 @@ function UserMenu({ avatarOnly }) {
 
   async function handleLogout() {
     await logoutUser()
+    await queryClient.cancelQueries()
+    await queryClient.invalidateQueries()
   }
 
   const userItems = [

@@ -6,6 +6,7 @@ function PageLayout({
   children,
   maxW = '6xl',
   title = 'Page',
+  description,
   primaryAction,
   icon,
   onClick,
@@ -29,7 +30,14 @@ function PageLayout({
                 <RiArrowLeftLine fontSize="1.2rem" />
               </Button>
             )}
-            <h1 className="font-semibold">{title}</h1>
+            <div>
+              <h1 className="font-semibold mb-3">{title}</h1>
+              {description && (
+                <p className="font-medium text-sm text-default-500">
+                  {description}
+                </p>
+              )}
+            </div>
           </div>
           {primaryAction && (
             <Button

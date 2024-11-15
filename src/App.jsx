@@ -67,7 +67,7 @@ function App() {
       >
         {isLoading && <Progress size="sm" isIndeterminate />}
         <RouterProvider router={router} />
-        <Toaster position="bottom-center" />
+        <Toaster position="top-center" />
       </CurrentWorkspaceContext.Provider>
     </main>
   )

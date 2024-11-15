@@ -1,5 +1,5 @@
 import {
-  RiMailSendLine,
+  RiRefreshLine,
   RiMailCheckLine,
   RiTerminalBoxLine,
   RiGroupLine,
@@ -10,14 +10,8 @@ const ICON_SIZE = '1.2rem'
 
 export const navItems = [
   {
-    name: 'Bulk',
+    name: 'Verify',
     path: '/dashboard',
-    startContent: <RiMailSendLine fontSize={ICON_SIZE} />,
-    endContent: null,
-  },
-  {
-    name: 'Single',
-    path: '/',
     startContent: <RiMailCheckLine fontSize={ICON_SIZE} />,
     endContent: null,
   },
@@ -31,6 +25,12 @@ export const navItems = [
     name: 'Team',
     path: '/team',
     startContent: <RiGroupLine fontSize={ICON_SIZE} />,
+    endContent: null,
+  },
+  {
+    name: 'Integrations',
+    path: '/integrations',
+    startContent: <RiRefreshLine fontSize={ICON_SIZE} />,
     endContent: null,
   },
   {

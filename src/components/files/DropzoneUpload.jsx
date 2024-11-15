@@ -3,13 +3,17 @@ import { useCallback } from 'react'
 import { Button } from '@nextui-org/react'
 import toast from 'react-hot-toast'
 import { useDarkMode } from '../../hooks/theme/useDarkMode'
+import { useHotkeys } from 'react-hotkeys-hook'
+import { useState } from 'react'
 
 const DropzoneUpload = ({
   onUpload,
   acceptedTypes = { 'text/csv': [] },
   maxFiles = 1,
+  fullScreen = false,
 }) => {
   const [darkMode] = useDarkMode()
+  const [isDragCancelled, setIsDragCancelled] = useState(false)
 
   const imgFolder = darkMode ? 'dark' : 'light'
 
@@ -57,6 +61,32 @@ const DropzoneUpload = ({
       }
     },
   })
+
+  useHotkeys('esc', () => setIsDragCancelled(true), {
+    enableOnTags: ['INPUT', 'TEXTAREA'],
+  })
+
+  const activeClass =
+    isDragActive && !isDragCancelled
+      ? 'z-10 bg-secondary-200/90'
+      : 'bg-transparent'
+
+  if (fullScreen) {
+    return (
+      <div
+        {...getRootProps()}
+        className={`h-screen w-screen fixed top-0 left-0 ${activeClass}`}
+      >
+        {isDragActive && !isDragCancelled && (
+          <div className={`w-full h-full flex items-center justify-center`}>
+            <p className="font-semibold text-4xl">
+              Drop it like it&apos;s hot!
+            </p>
+          </div>
+        )}
+      </div>
+    )
+  }
 
   return (
     <div

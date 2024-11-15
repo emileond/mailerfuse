@@ -60,7 +60,6 @@ export const useCreateEmailList = (currentWorkspace) => {
 
 // Function to delete an email list
 const deleteEmailList = async ({ listId }) => {
-  console.log('delete listId', listId)
   const { error } = await supabaseClient.from('lists').delete().eq('id', listId)
 
   if (error) {

@@ -29,7 +29,6 @@ export async function onRequestPost(context) {
   }
 
   const creditsNeeded = data.length
-  console.log('creditsNeeded', creditsNeeded)
 
   // 1. check credits
   const { data: credits, error: creditsError } = await supabase
@@ -98,7 +97,9 @@ export async function onRequestPost(context) {
         status: 'processing',
       })
       .eq('id', listId)
-  }
 
-  return new Response(JSON.stringify({ success: true }), { status: 200 })
+    return new Response(JSON.stringify({ list_id: listId }), {
+      status: 200,
+    })
+  }
 }

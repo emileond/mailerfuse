@@ -10,7 +10,6 @@ function WorkspaceSwitcher() {
   const [currentWorkspace, setCurrentWorkspace] = useCurrentWorkspace()
 
   useEffect(() => {
-    console.log('workspaces', workspaces)
     if (workspaces && workspaces.length > 0 && user && !currentWorkspace) {
       workspaces.find((workspace) => {
         if (workspace.role === 'owner') {
