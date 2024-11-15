@@ -1,4 +1,4 @@
-import { Button, Card, CardBody, Divider, Progress } from '@nextui-org/react'
+import { Button, Divider } from '@nextui-org/react'
 import { Link, useLocation } from 'react-router-dom'
 import Logo from '../Logo'
 import { navItems } from './navItems'

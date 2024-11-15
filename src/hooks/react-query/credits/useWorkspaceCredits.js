@@ -5,7 +5,7 @@ import { supabaseClient } from '../../../lib/supabase'
 const fetchWorkspaceCredits = async (workspace_id) => {
   const { data, error } = await supabaseClient
     .from('workspace_credits')
-    .select('*')
+    .select('available_credits')
     .eq('workspace_id', workspace_id)
     .single()
 

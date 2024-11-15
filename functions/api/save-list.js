@@ -1,19 +1,22 @@
 import { createClient } from '@supabase/supabase-js'
+import { configure, tasks } from '@trigger.dev/sdk/v3'
 
 export async function onRequestPost(context) {
   const supabase = createClient(
     context.env.SUPABASE_URL,
-    context.env.SUPABASE_KEY
+    context.env.SUPABASE_SERVICE_KEY
   )
   const { fileName, data, emailColumn, workspace_id, session } =
     await context.request.json()
 
+  // basic 400 error handling
   if (!fileName || !workspace_id || !session || !data || !emailColumn) {
     return new Response(JSON.stringify({ error: 'Missing parameters' }), {
       status: 400,
     })
   }
 
+  // auth check
   const { error: authError } = await supabase.auth.setSession({
     access_token: session.access_token,
     refresh_token: session.refresh_token,
@@ -25,30 +28,13 @@ export async function onRequestPost(context) {
     })
   }
 
-  // Create a new file in the "files" table
-  const { data: fileData, error: fileError } = await supabase
-    .from('lists')
-    .insert([
-      {
-        name: fileName,
-        workspace_id: workspace_id,
-        status: 'pending',
-        size: data.length,
-      },
-    ])
-    .select('id')
-    .single()
+  const creditsNeeded = data.length
+  console.log('creditsNeeded', creditsNeeded)
 
-  if (fileError) {
-    console.log(fileError)
-    return new Response(JSON.stringify({ error: fileError.message }), {
-      status: 500,
-    })
-  }
-
+  // 1. check credits
   const { data: credits, error: creditsError } = await supabase
     .from('workspace_credits')
-    .select('total_credits, used_credits')
+    .select('available_credits')
     .eq('workspace_id', workspace_id)
     .single()
 
@@ -58,12 +44,11 @@ export async function onRequestPost(context) {
     })
   }
 
-  const { total_credits, used_credits } = credits
+  const { available_credits } = credits
+  const notEnoughCredits = creditsNeeded > available_credits
 
-  let response
-
-  if (used_credits + data.length > total_credits) {
-    response = new Response(
+  if (notEnoughCredits) {
+    return new Response(
       JSON.stringify({
         error: 'Not enough credits',
         error_code: 'INSUFFICIENT_CREDITS',
@@ -71,50 +56,49 @@ export async function onRequestPost(context) {
       { status: 403 }
     )
   } else {
-    response = new Response(JSON.stringify({ success: true }), {
-      status: 200,
+    // 2. If enough credits, save list in db
+    const { data: fileData, error: fileError } = await supabase
+      .from('lists')
+      .insert([
+        {
+          name: fileName,
+          workspace_id: workspace_id,
+          status: 'pending',
+          size: data.length,
+        },
+      ])
+      .select('id')
+      .single()
+
+    if (fileError) {
+      console.log(fileError)
+      return new Response(JSON.stringify({ error: fileError.message }), {
+        status: 500,
+      })
+    }
+    const listId = fileData.id
+
+    // 4. Trigger validation task
+    configure({
+      secretKey: context.env.TRIGGER_SECRET_KEY,
     })
+
+    const handle = await tasks.trigger('bulk-email-verification', {
+      data,
+      emailColumn,
+      listId,
+      workspace_id,
+    })
+
+    // 4. Update list with task id
+    await supabase
+      .from('lists')
+      .update({
+        task_id: handle?.id,
+        status: 'processing',
+      })
+      .eq('id', listId)
   }
 
-  const listId = fileData.id
-
-  async function saveRecords() {
-    // Function to chunk the array into smaller arrays
-    const chunkArray = (array, size) => {
-      const chunks = []
-      for (let i = 0; i < array.length; i += size) {
-        chunks.push(array.slice(i, i + size))
-      }
-      return chunks
-    }
-
-    // Define the batch size
-    const batchSize = 500
-    const chunks = chunkArray(data, batchSize)
-
-    // Process each chunk
-    for (const chunk of chunks) {
-      const records = chunk.map((item) => ({
-        list_id: listId,
-        email: item[emailColumn],
-        custom_fields: item, // jsonb, custom fields without email column
-        workspace_id: workspace_id,
-      }))
-
-      const { error: insertError } = await supabase
-        .from('list_records')
-        .insert(records)
-
-      if (insertError) {
-        return new Response(JSON.stringify({ error: insertError.message }), {
-          status: 500,
-        })
-      }
-    }
-  }
-
-  // Function to chunk the data
-  context.waitUntil(saveRecords())
-
-  return response
+  return new Response(JSON.stringify({ success: true }), { status: 200 })
 }

@@ -13,11 +13,18 @@ import {
   DropdownItem,
   Button,
   Chip,
+  Modal,
+  ModalContent,
+  ModalBody,
+  Image,
+  ModalHeader,
+  Tooltip,
 } from '@nextui-org/react'
 import AppLayout from '../components/layout/AppLayout'
 import PageLayout from '../components/layout/PageLayout'
 import DropzoneUpload from '../components/files/DropzoneUpload'
 import { RiAddLine, RiMore2Fill, RiDeleteBin6Line } from 'react-icons/ri'
+import { PiFileCsvDuotone } from 'react-icons/pi'
 import useCurrentWorkspace from '../hooks/useCurrentWorkspace'
 import Papa from 'papaparse'
 import {
@@ -29,11 +36,18 @@ import { useQueryClient } from '@tanstack/react-query'
 import ky from 'ky'
 import { supabaseClient } from '../lib/supabase'
 import toast from 'react-hot-toast'
+import { useCallback, useState } from 'react'
+import { useDarkMode } from '../hooks/theme/useDarkMode'
+import Paywall from '../components/marketing/Paywall'
 
 function DashboardPage() {
   const [currentWorkspace] = useCurrentWorkspace()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const [isFileUploading, setIsFileUploading] = useState(false)
+  const [insufficientCredits, setInsufficientCredits] = useState(false)
+  const [startNewList, setStartNewList] = useState(false)
+  const [darkMode] = useDarkMode()
 
   const {
     data: emailLists,
@@ -47,6 +61,8 @@ function DashboardPage() {
   }
 
   async function handleParse(data) {
+    setStartNewList(false)
+    setIsFileUploading(true)
     // save file name without extension
     const fileName = data?.fileName?.split('.')[0]
 
@@ -70,21 +86,27 @@ function DashboardPage() {
         }
 
         if (emailColumn) {
+          // filter to only rows with email
+          const filteredData = await data.filter((row) => row[emailColumn])
+
           try {
             const { data: session } = await supabaseClient.auth.getSession()
             await ky
               .post('/api/save-list', {
                 json: {
                   fileName,
-                  data,
+                  data: filteredData,
                   emailColumn,
                   workspace_id: currentWorkspace?.workspace_id,
                   session: session?.session,
                 },
               })
               .json()
+            toast('List validation started', {
+              icon: '🚀',
+            })
           } catch (error) {
-            console.log(error)
+            console.error(error)
             if (error.response) {
               // If you want to inspect the response details (e.g., status code)
               const errorData = await error.response.json()
@@ -95,26 +117,77 @@ function DashboardPage() {
                   type: 'error',
                   duration: 5000,
                 })
+                setInsufficientCredits(true)
               }
             }
+          } finally {
+            setIsFileUploading(false)
           }
           await queryClient.invalidateQueries({
             queryKey: ['emailLists', currentWorkspace?.workspace_id],
           })
         } else {
-          console.log('No email column found')
+          toast('No email column found', {
+            type: 'error',
+            duration: 5000,
+          })
         }
       },
     })
   }
+
+  // Helper function to get Tailwind color classes
+  const getColorForKey = (key) => {
+    const colorMapping = {
+      deliverable: 'bg-green-500/90',
+      risky: 'bg-yellow-400/90',
+      undeliverable: 'bg-red-400/90',
+      unknown: 'bg-gray-400/90',
+    }
+    return colorMapping[key] || 'bg-default-500' // Fallback color if key is not found
+  }
+
+  const renderStackedBarChart = useCallback((summary) => {
+    console.log('summary', summary)
+    if (!summary) return null
+
+    const total = Object.values(summary).reduce((sum, value) => sum + value, 0)
+
+    return (
+      <div className="flex w-full h-2 bg-gray-200 rounded-lg overflow-hidden">
+        {Object.keys(summary).map((key, index) => {
+          const proportion = (summary[key] / total) * 100
+          return (
+            <Tooltip key={index} content={`${summary[key]} ${key}`}>
+              <div
+                className={`h-full ${getColorForKey(key)}`}
+                style={{ width: `${proportion}%` }} // Use inline style for dynamic width
+              />
+            </Tooltip>
+          )
+        })}
+      </div>
+    )
+  }, [])
+
   return (
     <AppLayout>
       <PageLayout
+        maxW="4xl"
         title="Email lists"
         primaryAction="New list"
         icon={<RiAddLine fontSize="1.1rem" />}
-        onClick={() => console.log('clicked')}
+        onClick={() => setStartNewList(true)}
       >
+        <Paywall
+          isOpen={insufficientCredits}
+          onOpenChange={(open) => {
+            if (!open) {
+              setInsufficientCredits(false)
+            }
+          }}
+          feature="more credits"
+        />
         <Table
           aria-label="Email lists"
           onRowAction={(key) => navigate(`/lists/${key}`)}
@@ -134,15 +207,25 @@ function DashboardPage() {
           >
             {emailLists?.map((list) => (
               <TableRow key={list.id} className="cursor-pointer">
-                <TableCell className="min-w-[100px] max-w-[120px] whitespace-nowrap text-ellipsis overflow-hidden">
-                  {list?.name}
+                <TableCell className="font-medium min-w-[100px] max-w-[120px] whitespace-nowrap text-ellipsis overflow-hidden">
+                  <div className="flex gap-2 items-center">
+                    <PiFileCsvDuotone
+                      fontSize="1.4rem"
+                      className="text-default-600"
+                    />
+
+                    {list?.name}
+                  </div>
                 </TableCell>
-                <TableCell>{list?.size}</TableCell>
+                <TableCell className="font-medium">{list?.size}</TableCell>
                 <TableCell>
-                  <Progress />
+                  <div className="flex gap-2 items-center">
+                    {renderStackedBarChart(list?.summary)}
+                  </div>
                 </TableCell>
                 <TableCell>
                   <Chip
+                    size="sm"
                     variant="flat"
                     color={
                       (list?.status === 'pending' && 'default') ||
@@ -178,6 +261,72 @@ function DashboardPage() {
             ))}
           </TableBody>
         </Table>
+        <Modal
+          placement="top-center"
+          isOpen={startNewList}
+          size="3xl"
+          onOpenChange={(open) => {
+            if (!open) {
+              setStartNewList(false)
+            }
+          }}
+        >
+          <ModalContent>
+            <ModalHeader>
+              <h2 className="font-semibold text-2xl">Verify a new list</h2>
+            </ModalHeader>
+            <ModalBody className="py-6">
+              <div className="gap-3">
+                <DropzoneUpload onUpload={handleParse} />
+                <ol className="list-decimal text-sm flex flex-col gap-2 p-6">
+                  <span className="font-semibold">Instructions</span>
+                  <li>Upload your list as a CSV file.</li>
+                  <li>
+                    Ensure emails are in a single column (other columns are
+                    allowed and won’t be affected).
+                  </li>
+                  <li>
+                    We’ll notify you as soon as the verification process is
+                    finished.
+                  </li>
+                </ol>
+              </div>
+            </ModalBody>
+          </ModalContent>
+        </Modal>
+        <Modal
+          placement="top-center"
+          isDismissable={false}
+          backdrop="blur"
+          isOpen={isFileUploading}
+          hideCloseButton
+        >
+          <ModalContent>
+            <ModalBody className="py-9 flex flex-col items-center">
+              <h2 className="font-semibold text-2xl text-center">
+                Getting things ready
+              </h2>
+              <p className="font-medium">
+                This might take a moment, please wait...
+              </p>
+              <Image
+                src={`/empty-states/${darkMode ? 'dark' : 'light'}/stack.svg`}
+                alt="uploading"
+                width={240}
+                height={240}
+              />
+              <Progress
+                size="sm"
+                isIndeterminate
+                aria-label="Processing..."
+                className="max-w-md w-full"
+              />
+              <p className="font-medium text-sm text-default-500 mt-3">
+                This alert will close automatically
+              </p>
+            </ModalBody>
+          </ModalContent>
+        </Modal>
       </PageLayout>
     </AppLayout>
   )
