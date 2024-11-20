@@ -18,6 +18,11 @@ export default defineConfig({
         secure: false,
         changeOrigin: true,
       },
+      '/public-api': {
+        target: 'http://localhost:8787',
+        secure: false,
+        changeOrigin: true,
+      },
     },
   },
 })

@@ -1,4 +1,4 @@
-export async function onRequestPost() {
+export async function onRequestGet() {
   return Response.json({
     message: 'Hello visitor!',
   })
