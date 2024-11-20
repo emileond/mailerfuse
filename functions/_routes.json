@@ -1,7 +1,7 @@
 {
   "include": [
     {
-      "pattern": "https://api.myapp.com/*",
+      "pattern": "https://api.mailerfuse.com/*",
       "functions": "public-api"
     }
   ],
