@@ -10,13 +10,20 @@ import { Progress } from '@nextui-org/react'
 import { useUser } from './hooks/react-query/user/useUser.js'
 import ListDetailsPage from './pages/ListDetailsPage.jsx'
 import OnboardingPage from './pages/Onboarding.jsx'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import CurrentWorkspaceContext from './context/currentWorkspace.js'
 import BlogPage from './pages/Blog.jsx'
 import BlogPost from './pages/BlogPost.jsx'
 import ApiDocsPage from './pages/ApiDocs.jsx'
 
 function App() {
+  useEffect(() => {
+    const isApiSubdomain = window.location.hostname === 'api.mailerfuse.com'
+    if (isApiSubdomain) {
+      window.location.href = 'https://docs.mailerfuse.com'
+    }
+  }, [])
+
   const { isLoading } = useUser()
   const [darkMode] = useDarkMode()
   const [currentWorkspace, setCurrentWorkspace] = useState(null)
