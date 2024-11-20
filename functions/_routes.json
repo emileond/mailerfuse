@@ -1,9 +1,0 @@
-{
-  "include": [
-    {
-      "pattern": "https://api.mailerfuse.com/*",
-      "functions": "public-api"
-    }
-  ],
-  "exclude": []
-}
