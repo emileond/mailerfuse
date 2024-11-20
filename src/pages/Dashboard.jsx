@@ -57,6 +57,7 @@ function DashboardPage() {
   const [darkMode] = useDarkMode()
   const [listsInProcess, setListsInProcess] = useState(null)
   const [singleVerification, setSingleVerification] = useState(null)
+  const [isSingleLoading, setIsSingleLoading] = useState(false)
 
   const { register, handleSubmit } = useForm()
 
@@ -72,6 +73,7 @@ function DashboardPage() {
   }
 
   const onSubmit = async (data) => {
+    setIsSingleLoading(true)
     try {
       const { data: session } = await supabaseClient.auth.getSession()
       const res = await ky
@@ -92,8 +94,9 @@ function DashboardPage() {
       })
     } catch (error) {
       console.error(error)
+    } finally {
+      setIsSingleLoading(false)
     }
-    // Add your verification logic here
   }
 
   async function handleParse(data) {
@@ -450,7 +453,12 @@ function DashboardPage() {
                         placeholder="Enter an email address"
                         {...register('email', { required: true })}
                       />
-                      <Button type="submit" size="lg" variant="bordered">
+                      <Button
+                        type="submit"
+                        size="lg"
+                        variant="bordered"
+                        isLoading={isSingleLoading}
+                      >
                         Verify
                       </Button>
                     </form>

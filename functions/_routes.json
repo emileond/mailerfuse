@@ -1,0 +1,9 @@
+{
+  "include": [
+    {
+      "pattern": "https://api.myapp.com/*",
+      "functions": "public-api"
+    }
+  ],
+  "exclude": []
+}
