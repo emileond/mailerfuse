@@ -2,10 +2,6 @@ import { createClient } from '@supabase/supabase-js'
 import { configure, tasks } from '@trigger.dev/sdk/v3'
 
 export async function onRequestPost(context) {
-  const supabase = createClient(
-    context.env.SUPABASE_URL,
-    context.env.SUPABASE_SERVICE_KEY
-  )
   const { fileName, data, emailColumn, workspace_id, session } =
     await context.request.json()
 
@@ -15,6 +11,11 @@ export async function onRequestPost(context) {
       status: 400,
     })
   }
+
+  const supabase = createClient(
+    context.env.SUPABASE_URL,
+    context.env.SUPABASE_SERVICE_KEY
+  )
 
   // auth check
   const { error: authError } = await supabase.auth.setSession({

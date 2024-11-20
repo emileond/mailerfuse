@@ -11,6 +11,7 @@ const DropzoneUpload = ({
   acceptedTypes = { 'text/csv': [] },
   maxFiles = 1,
   fullScreen = false,
+  children,
 }) => {
   const [darkMode] = useDarkMode()
   const [isDragCancelled, setIsDragCancelled] = useState(false)
@@ -73,17 +74,17 @@ const DropzoneUpload = ({
 
   if (fullScreen) {
     return (
-      <div
-        {...getRootProps()}
-        className={`h-screen w-screen fixed top-0 left-0 ${activeClass}`}
-      >
+      <div {...getRootProps()}>
         {isDragActive && !isDragCancelled && (
-          <div className={`w-full h-full flex items-center justify-center`}>
+          <div
+            className={`w-screen h-screen fixed top-0 left-0 flex items-center justify-center ${activeClass}`}
+          >
             <p className="font-semibold text-4xl">
               Drop it like it&apos;s hot!
             </p>
           </div>
         )}
+        {children}
       </div>
     )
   }

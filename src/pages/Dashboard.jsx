@@ -21,6 +21,10 @@ import {
   Input,
   Tabs,
   Tab,
+  Card,
+  CardHeader,
+  CardBody,
+  Divider,
 } from '@nextui-org/react'
 import AppLayout from '../components/layout/AppLayout'
 import PageLayout from '../components/layout/PageLayout'
@@ -41,6 +45,7 @@ import toast from 'react-hot-toast'
 import { useCallback, useEffect, useState } from 'react'
 import { useDarkMode } from '../hooks/theme/useDarkMode'
 import Paywall from '../components/marketing/Paywall'
+import { useForm } from 'react-hook-form'
 
 function DashboardPage() {
   const [currentWorkspace] = useCurrentWorkspace()
@@ -50,8 +55,10 @@ function DashboardPage() {
   const [insufficientCredits, setInsufficientCredits] = useState(false)
   const [startNewList, setStartNewList] = useState(false)
   const [darkMode] = useDarkMode()
-
   const [listsInProcess, setListsInProcess] = useState(null)
+  const [singleVerification, setSingleVerification] = useState(null)
+
+  const { register, handleSubmit } = useForm()
 
   const {
     data: emailLists,
@@ -62,6 +69,31 @@ function DashboardPage() {
 
   async function handleDelete(listId) {
     await deleteEmailList({ listId })
+  }
+
+  const onSubmit = async (data) => {
+    try {
+      const { data: session } = await supabaseClient.auth.getSession()
+      const res = await ky
+        .post('/api/validate-email', {
+          json: {
+            email: data.email,
+            session: session?.session,
+            workspace_id: currentWorkspace?.workspace_id,
+          },
+        })
+        .json()
+
+      setSingleVerification(res)
+
+      toast('Verification completed', {
+        type: 'success',
+        icon: '🚀',
+      })
+    } catch (error) {
+      console.error(error)
+    }
+    // Add your verification logic here
   }
 
   async function handleParse(data) {
@@ -106,8 +138,6 @@ function DashboardPage() {
                 },
               })
               .json()
-
-            console.log(res)
 
             setListsInProcess((prev) => {
               if (prev) {
@@ -199,7 +229,6 @@ function DashboardPage() {
             filter: `id=eq.${list}`,
           },
           (payload) => {
-            console.log('payload', payload)
             if (payload?.new?.status !== 'processing') {
               ;(async () => {
                 await queryClient.invalidateQueries({
@@ -226,201 +255,291 @@ function DashboardPage() {
   }, [currentWorkspace?.workspace_id, listsInProcess])
 
   return (
-    <AppLayout>
-      <DropzoneUpload fullScreen onUpload={handleParse} />
-      <Paywall
-        isOpen={insufficientCredits}
-        onOpenChange={(open) => {
-          if (!open) {
-            setInsufficientCredits(false)
-          }
-        }}
-        feature="more credits"
-      />
-      <Modal
-        placement="top-center"
-        isOpen={startNewList}
-        size="3xl"
-        onOpenChange={(open) => {
-          if (!open) {
-            setStartNewList(false)
-          }
-        }}
-      >
-        <ModalContent>
-          <ModalHeader>
-            <h2 className="font-semibold text-2xl">Verify a new list</h2>
-          </ModalHeader>
-          <ModalBody className="py-6">
-            <div className="gap-3">
-              <DropzoneUpload onUpload={handleParse} />
-              <ol className="list-decimal text-sm flex flex-col gap-2 p-6">
-                <span className="font-semibold">Instructions</span>
-                <li>Upload your list as a CSV file.</li>
-                <li>
-                  Ensure emails are in a single column (other columns are
-                  allowed and won’t be affected).
-                </li>
-                <li>
-                  We’ll notify you as soon as the verification process is
-                  finished.
-                </li>
-              </ol>
-            </div>
-          </ModalBody>
-        </ModalContent>
-      </Modal>
-      <Modal
-        placement="top-center"
-        isDismissable={false}
-        backdrop="blur"
-        isOpen={isFileUploading}
-        hideCloseButton
-      >
-        <ModalContent>
-          <ModalBody className="py-9 flex flex-col items-center">
-            <h2 className="font-semibold text-2xl text-center">
-              Getting things ready
-            </h2>
-            <p className="font-medium">
-              This might take a moment, please wait...
-            </p>
-            <Image
-              src={`/empty-states/${darkMode ? 'dark' : 'light'}/stack.svg`}
-              alt="uploading"
-              width={240}
-              height={240}
-            />
-            <Progress
-              size="sm"
-              isIndeterminate
-              aria-label="Processing..."
-              className="max-w-md w-full"
-            />
-            <p className="font-medium text-sm text-default-500 mt-3">
-              This alert will close automatically
-            </p>
-          </ModalBody>
-        </ModalContent>
-      </Modal>
-      <PageLayout
-        maxW="4xl"
-        title="Verify"
-        description="Verify a single email or a list"
-        primaryAction="New list"
-        icon={<RiAddLine fontSize="1.1rem" />}
-        onClick={() => setStartNewList(true)}
-      >
-        <div className="flex flex-col gap-3">
-          <Tabs>
-            <Tab key="list" title="List">
-              <Table
-                aria-label="Email lists"
-                onRowAction={(key) => navigate(`/lists/${key}`)}
-                selectionMode="single"
-              >
-                <TableHeader>
-                  <TableColumn>NAME</TableColumn>
-                  <TableColumn>SIZE</TableColumn>
-                  <TableColumn>Overview</TableColumn>
-                  <TableColumn>STATUS</TableColumn>
-                  <TableColumn hideHeader>Action</TableColumn>
-                </TableHeader>
-                <TableBody
-                  isLoading={isPending || isFetching}
-                  emptyContent={<DropzoneUpload onUpload={handleParse} />}
+    <DropzoneUpload fullScreen onUpload={handleParse}>
+      <AppLayout>
+        <Paywall
+          isOpen={insufficientCredits}
+          onOpenChange={(open) => {
+            if (!open) {
+              setInsufficientCredits(false)
+            }
+          }}
+          feature="more credits"
+        />
+        <Modal
+          placement="top-center"
+          isOpen={startNewList}
+          size="3xl"
+          onOpenChange={(open) => {
+            if (!open) {
+              setStartNewList(false)
+            }
+          }}
+        >
+          <ModalContent>
+            <ModalHeader>
+              <h2 className="font-semibold text-2xl">Verify a new list</h2>
+            </ModalHeader>
+            <ModalBody className="py-6">
+              <div className="gap-3">
+                <DropzoneUpload onUpload={handleParse} />
+                <ol className="list-decimal text-sm flex flex-col gap-2 p-6">
+                  <span className="font-semibold">Instructions</span>
+                  <li>Upload your list as a CSV file.</li>
+                  <li>
+                    Ensure emails are in a single column (other columns are
+                    allowed and won’t be affected).
+                  </li>
+                  <li>
+                    We’ll notify you as soon as the verification process is
+                    finished.
+                  </li>
+                </ol>
+              </div>
+            </ModalBody>
+          </ModalContent>
+        </Modal>
+        <Modal
+          placement="top-center"
+          isDismissable={false}
+          backdrop="blur"
+          isOpen={isFileUploading}
+          hideCloseButton
+        >
+          <ModalContent>
+            <ModalBody className="py-9 flex flex-col items-center">
+              <h2 className="font-semibold text-2xl text-center">
+                Getting things ready
+              </h2>
+              <p className="font-medium">
+                This might take a moment, please wait...
+              </p>
+              <Image
+                src={`/empty-states/${darkMode ? 'dark' : 'light'}/stack.svg`}
+                alt="uploading"
+                width={240}
+                height={240}
+              />
+              <Progress
+                size="sm"
+                isIndeterminate
+                aria-label="Processing..."
+                className="max-w-md w-full"
+              />
+              <p className="font-medium text-sm text-default-500 mt-3">
+                This alert will close automatically
+              </p>
+            </ModalBody>
+          </ModalContent>
+        </Modal>
+        <PageLayout
+          maxW="4xl"
+          title="Verify"
+          description="Verify a single email or a list"
+          primaryAction="New list"
+          icon={<RiAddLine fontSize="1.1rem" />}
+          onClick={() => setStartNewList(true)}
+        >
+          <div className="flex flex-col gap-3">
+            <Tabs>
+              <Tab key="list" title="List">
+                <Table
+                  aria-label="Email lists"
+                  onRowAction={(key) => navigate(`/lists/${key}`)}
+                  selectionMode="single"
                 >
-                  {emailLists?.map((list) => (
-                    <TableRow key={list.id} className="cursor-pointer">
-                      <TableCell className="font-medium min-w-[100px] max-w-[120px] whitespace-nowrap text-ellipsis overflow-hidden">
-                        <div className="flex gap-2 items-center">
-                          <PiFileCsvDuotone
-                            fontSize="1.4rem"
-                            className="text-default-600"
-                          />
-
-                          {list?.name}
-                        </div>
-                      </TableCell>
-                      <TableCell className="font-medium">
-                        {list?.size}
-                      </TableCell>
-                      <TableCell>
-                        {list?.status !== 'processing' ? (
+                  <TableHeader>
+                    <TableColumn>NAME</TableColumn>
+                    <TableColumn>SIZE</TableColumn>
+                    <TableColumn>Overview</TableColumn>
+                    <TableColumn>STATUS</TableColumn>
+                    <TableColumn hideHeader>Action</TableColumn>
+                  </TableHeader>
+                  <TableBody
+                    isLoading={isPending || isFetching}
+                    emptyContent={<DropzoneUpload onUpload={handleParse} />}
+                  >
+                    {emailLists?.map((list) => (
+                      <TableRow key={list.id} className="cursor-pointer">
+                        <TableCell className="font-medium min-w-[100px] max-w-[120px] whitespace-nowrap text-ellipsis overflow-hidden">
                           <div className="flex gap-2 items-center">
-                            {renderStackedBarChart(list?.summary)}
+                            <PiFileCsvDuotone
+                              fontSize="1.4rem"
+                              className="text-default-600"
+                            />
+
+                            {list?.name}
                           </div>
-                        ) : (
-                          <Progress
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          {list?.size}
+                        </TableCell>
+                        <TableCell>
+                          {list?.status !== 'processing' ? (
+                            <div className="flex gap-2 items-center">
+                              {renderStackedBarChart(list?.summary)}
+                            </div>
+                          ) : (
+                            <Progress
+                              size="sm"
+                              isIndeterminate
+                              aria-label="Processing..."
+                              className="max-w-md w-full"
+                            />
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <Chip
                             size="sm"
-                            isIndeterminate
-                            aria-label="Processing..."
-                            className="max-w-md w-full"
-                          />
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <Chip
-                          size="sm"
-                          variant="flat"
-                          color={
-                            (list?.status === 'pending' && 'default') ||
-                            (list?.status === 'processing' && 'primary') ||
-                            (list?.status === 'completed' && 'success') ||
-                            (list?.status === 'error' && 'danger')
-                          }
-                        >
-                          {list?.status}
-                        </Chip>
-                      </TableCell>
-                      <TableCell className="w-[56px]">
-                        <Dropdown>
-                          <DropdownTrigger>
-                            <Button variant="bordered" isIconOnly>
-                              <RiMore2Fill fontSize="1.1rem" />
-                            </Button>
-                          </DropdownTrigger>
-                          <DropdownMenu
-                            aria-label="Static Actions"
-                            disabledKeys={
-                              list.status === 'processing' ? ['delete'] : []
+                            variant="flat"
+                            color={
+                              (list?.status === 'pending' && 'default') ||
+                              (list?.status === 'processing' && 'primary') ||
+                              (list?.status === 'completed' && 'success') ||
+                              (list?.status === 'error' && 'danger')
                             }
                           >
-                            <DropdownItem
-                              key="delete"
-                              className="text-danger"
-                              color="danger"
-                              startContent={
-                                <RiDeleteBin6Line fontSize="1.1rem" />
+                            {list?.status}
+                          </Chip>
+                        </TableCell>
+                        <TableCell className="w-[56px]">
+                          <Dropdown>
+                            <DropdownTrigger>
+                              <Button variant="bordered" isIconOnly>
+                                <RiMore2Fill fontSize="1.1rem" />
+                              </Button>
+                            </DropdownTrigger>
+                            <DropdownMenu
+                              aria-label="Static Actions"
+                              disabledKeys={
+                                list.status === 'processing' ? ['delete'] : []
                               }
-                              onClick={() => handleDelete(list?.id)}
                             >
-                              Delete
-                            </DropdownItem>
-                          </DropdownMenu>
-                        </Dropdown>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </Tab>
-            <Tab key="single" title="Single email">
-              <div className="flex gap-3">
-                <Input
-                  size="lg"
-                  isClearable
-                  placeholder="Enter an email address"
-                />
-                <Button size="lg" variant="bordered">
-                  Verify
-                </Button>
-              </div>
-            </Tab>
-          </Tabs>
-        </div>
-      </PageLayout>
-    </AppLayout>
+                              <DropdownItem
+                                key="delete"
+                                className="text-danger"
+                                color="danger"
+                                startContent={
+                                  <RiDeleteBin6Line fontSize="1.1rem" />
+                                }
+                                onClick={() => handleDelete(list?.id)}
+                              >
+                                Delete
+                              </DropdownItem>
+                            </DropdownMenu>
+                          </Dropdown>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </Tab>
+              <Tab key="single" title="Single email">
+                <main className="max-w-xl flex flex-col gap-6 mx-auto py-3">
+                  <div>
+                    <h5 className="text-sm font-medium text-default-500 mb-3">
+                      Email address
+                    </h5>
+                    <form
+                      onSubmit={handleSubmit(onSubmit)}
+                      className="w-full flex gap-3"
+                    >
+                      <Input
+                        size="lg"
+                        isClearable
+                        placeholder="Enter an email address"
+                        {...register('email', { required: true })}
+                      />
+                      <Button type="submit" size="lg" variant="bordered">
+                        Verify
+                      </Button>
+                    </form>
+                  </div>
+                  {singleVerification && (
+                    <div>
+                      <h5 className="text-sm font-medium text-default-500 mb-3">
+                        Result
+                      </h5>
+                      <Card shadow="sm">
+                        <CardHeader>
+                          <div className="w-full flex justify-between px-6">
+                            <span className="font-medium">
+                              {singleVerification?.email}
+                            </span>
+                            <Chip
+                              size="sm"
+                              variant="flat"
+                              color={
+                                (singleVerification?.status === 'unknown' &&
+                                  'default') ||
+                                (singleVerification?.status === 'risky' &&
+                                  'warning') ||
+                                (singleVerification?.status ===
+                                  'undeliverable' &&
+                                  'danger') ||
+                                (singleVerification?.status === 'deliverable' &&
+                                  'success')
+                              }
+                            >
+                              {singleVerification?.status}
+                            </Chip>
+                          </div>
+                        </CardHeader>
+                        <Divider />
+                        <CardBody className="p-6">
+                          <div className="flex gap-6 text-sm font-medium mx-auto">
+                            <div className="flex flex-col items-end gap-3 text-default-500">
+                              <span>Syntax error:</span>
+                              <span>Disposable:</span>
+                              <span>Gibberish:</span>
+                              <span>Did you mean:</span>
+                              <span>Role:</span>
+                              <span>Domain status:</span>
+                              <span>MX Record:</span>
+                            </div>
+                            <div className="flex flex-col gap-3">
+                              <span>
+                                {singleVerification?.syntax_error
+                                  ? 'Yes'
+                                  : 'No'}
+                              </span>
+                              <span>
+                                {singleVerification?.disposable ? 'Yes' : 'No'}
+                              </span>
+                              <span>
+                                {singleVerification?.gibberish ? 'Yes' : 'No'}
+                              </span>
+                              <span>
+                                {singleVerification?.did_you_mean
+                                  ? singleVerification?.did_you_mean
+                                  : '-'}
+                              </span>
+                              <span>
+                                {singleVerification?.role ? 'Yes' : 'No'}
+                              </span>
+                              <span>
+                                {singleVerification?.domain_status
+                                  ? singleVerification?.domain_status
+                                  : '-'}
+                              </span>
+                              <span>
+                                {singleVerification?.mx_record
+                                  ? singleVerification?.mx_record
+                                  : '-'}
+                              </span>
+                            </div>
+                          </div>
+                        </CardBody>
+                      </Card>
+                    </div>
+                  )}
+                </main>
+              </Tab>
+            </Tabs>
+          </div>
+        </PageLayout>
+      </AppLayout>
+    </DropzoneUpload>
   )
 }
 
