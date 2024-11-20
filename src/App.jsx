@@ -12,6 +12,9 @@ import ListDetailsPage from './pages/ListDetailsPage.jsx'
 import OnboardingPage from './pages/Onboarding.jsx'
 import { useState } from 'react'
 import CurrentWorkspaceContext from './context/currentWorkspace.js'
+import BlogPage from './pages/Blog.jsx'
+import BlogPost from './pages/BlogPost.jsx'
+import ApiDocsPage from './pages/ApiDocs.jsx'
 
 function App() {
   const { isLoading } = useUser()
@@ -21,6 +24,18 @@ function App() {
     {
       path: '/',
       element: <LandingPage />,
+    },
+    {
+      path: '/docs',
+      element: <ApiDocsPage />,
+    },
+    {
+      path: '/blog',
+      element: <BlogPage />,
+    },
+    {
+      path: '/blog/:slug', // Dynamic route for individual blog posts
+      element: <BlogPost />,
     },
     {
       path: '/login',
