@@ -11,18 +11,4 @@ export default defineConfig({
     },
     react({ include: /\.(jsx|js|mdx|md|tsx|ts)$/ }),
   ],
-  server: {
-    proxy: {
-      '/api': {
-        target: 'http://localhost:8787',
-        secure: false,
-        changeOrigin: true,
-      },
-      '/public-api': {
-        target: 'http://localhost:8787',
-        secure: false,
-        changeOrigin: true,
-      },
-    },
-  },
 })
