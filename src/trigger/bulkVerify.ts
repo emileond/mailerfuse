@@ -156,6 +156,7 @@ export const emailVerificationTask = task({
               workspace_id: workspace_id,
             }
           } else {
+            await new Promise((resolve) => setTimeout(resolve, 500))
             const recordsResult = await verifyRecords(domain)
             await supabase.from('domain_cache').insert({
               domain,

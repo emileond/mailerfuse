@@ -11,4 +11,13 @@ export default defineConfig({
     },
     react({ include: /\.(jsx|js|mdx|md|tsx|ts)$/ }),
   ],
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8788',
+        secure: false,
+        changeOrigin: true,
+      },
+    },
+  },
 })
