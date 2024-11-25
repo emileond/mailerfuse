@@ -18,21 +18,19 @@ function WorkspaceUsageCard() {
         className="hover:bg-content2"
         onPress={() => setIsPaywallOpen(true)}
       >
-        <CardBody>
-          <div className="flex items-center justify-between mb-2">
-            <span className="font-medium text-sm">
-              {Intl.NumberFormat('en-US').format(credits?.available_credits)}{' '}
-              credits
-            </span>
-            <p className="p-1 font-semibold text-secondary text-sm">Get more</p>
-          </div>
+        <CardBody className="text-center">
+          <span className="font-medium text-sm text-default-600">
+            {Intl.NumberFormat().format(credits?.available_credits)} credits
+          </span>
           <Progress
             size="sm"
             color="success"
             minValue={0}
             maxValue={25000}
             value={credits?.available_credits}
+            className="my-2"
           />
+          <p className="p-1 font-semibold text-secondary text-sm">Get more</p>
         </CardBody>
       </Card>
       <Paywall

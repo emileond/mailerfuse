@@ -15,6 +15,10 @@ import CurrentWorkspaceContext from './context/currentWorkspace.js'
 import BlogPage from './pages/Blog.jsx'
 import BlogPost from './pages/BlogPost.jsx'
 import ApiDocsPage from './pages/ApiDocs.jsx'
+import ApiPage from './pages/Api.jsx'
+import TeamPage from './pages/Team.jsx'
+import IntegrationsPage from './pages/Integrations.jsx'
+import SettingsPage from './pages/Settings.jsx'
 
 function App() {
   const { isLoading } = useUser()
@@ -66,6 +70,38 @@ function App() {
       element: (
         <ProtectedRoute>
           <ListDetailsPage />
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: '/api',
+      element: (
+        <ProtectedRoute>
+          <ApiPage />
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: '/team',
+      element: (
+        <ProtectedRoute>
+          <TeamPage />
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: '/integrations',
+      element: (
+        <ProtectedRoute>
+          <IntegrationsPage />
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: '/settings',
+      element: (
+        <ProtectedRoute>
+          <SettingsPage />
         </ProtectedRoute>
       ),
     },

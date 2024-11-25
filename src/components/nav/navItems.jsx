@@ -17,7 +17,7 @@ export const navItems = [
   },
   {
     name: 'API',
-    path: '/',
+    path: '/api',
     startContent: <RiTerminalBoxLine fontSize={ICON_SIZE} />,
     endContent: null,
   },

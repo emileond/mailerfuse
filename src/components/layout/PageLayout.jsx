@@ -11,6 +11,7 @@ function PageLayout({
   icon,
   onClick,
   backBtn,
+  customElements,
 }) {
   const navigate = useNavigate()
 
@@ -39,6 +40,7 @@ function PageLayout({
               )}
             </div>
           </div>
+          {customElements}
           {primaryAction && (
             <Button
               onClick={handleOnclick}

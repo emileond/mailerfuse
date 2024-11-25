@@ -30,12 +30,7 @@ import AppLayout from '../components/layout/AppLayout'
 import PageLayout from '../components/layout/PageLayout'
 import DropzoneUpload from '../components/files/DropzoneUpload'
 import { RiAddLine, RiMore2Fill, RiDeleteBin6Line } from 'react-icons/ri'
-import {
-  PiFileCsvDuotone,
-  PiPaperPlaneTiltDuotone,
-  PiShieldCheckDuotone,
-  PiWarningDiamondDuotone,
-} from 'react-icons/pi'
+import { PiFileCsvDuotone } from 'react-icons/pi'
 import useCurrentWorkspace from '../hooks/useCurrentWorkspace'
 import Papa from 'papaparse'
 import {
@@ -51,6 +46,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useDarkMode } from '../hooks/theme/useDarkMode'
 import Paywall from '../components/marketing/Paywall'
 import { useForm } from 'react-hook-form'
+import ExportBtn from '../components/lists/ExportListBtn'
 
 function DashboardPage() {
   const [currentWorkspace] = useCurrentWorkspace()
@@ -222,41 +218,6 @@ function DashboardPage() {
     )
   }, [])
 
-  const downloadCsv = async (listId, listName, filters, type) => {
-    try {
-      const res = await ky.get(`/api/list/export/${listId}`, {
-        headers: {
-          'x-filters': JSON.stringify(filters),
-        },
-      })
-
-      // Ensure the response is a blob
-      const blob = await res.blob()
-
-      // Create a temporary download link
-      const url = window.URL.createObjectURL(blob)
-      const link = document.createElement('a')
-      link.href = url
-
-      // Set a meaningful filename
-      link.download = `${listName}_${type}_mailerfuse.csv`
-
-      // Trigger the download
-      document.body.appendChild(link)
-      link.click()
-
-      // Clean up
-      document.body.removeChild(link)
-      window.URL.revokeObjectURL(url)
-    } catch (error) {
-      console.error('Error downloading CSV:', error)
-      toast('Error downloading CSV', {
-        type: 'error',
-        duration: 5000,
-      })
-    }
-  }
-
   useEffect(() => {
     if (!listsInProcess || !currentWorkspace?.workspace_id) return
 
@@ -392,7 +353,7 @@ function DashboardPage() {
                 >
                   <TableHeader>
                     <TableColumn>NAME</TableColumn>
-                    <TableColumn>SIZE</TableColumn>
+                    <TableColumn>Emails</TableColumn>
                     <TableColumn>Status</TableColumn>
                     <TableColumn>Overview</TableColumn>
                     <TableColumn>Date</TableColumn>
@@ -410,12 +371,11 @@ function DashboardPage() {
                               fontSize="1.4rem"
                               className="text-default-600"
                             />
-
                             {list?.name}
                           </div>
                         </TableCell>
                         <TableCell className="font-medium">
-                          {list?.size}
+                          {Intl.NumberFormat().format(list?.size)}
                         </TableCell>
                         <TableCell>
                           <Chip
@@ -453,70 +413,7 @@ function DashboardPage() {
                         <TableCell className="w-[56px]">
                           <div className="flex gap-3">
                             {list?.status === 'completed' && (
-                              <Dropdown backdrop="blur">
-                                <DropdownTrigger>
-                                  <Button
-                                    variant="ghost"
-                                    color="secondary"
-                                    size="sm"
-                                  >
-                                    Export
-                                  </Button>
-                                </DropdownTrigger>
-                                <DropdownMenu aria-label="Static Actions">
-                                  <DropdownItem
-                                    key="max-reach"
-                                    description="Deliverable, risky and unknown emails"
-                                    startContent={
-                                      <PiPaperPlaneTiltDuotone className="text-2xl text-blue-500" />
-                                    }
-                                    onClick={() =>
-                                      downloadCsv(
-                                        list?.id,
-                                        list?.name,
-                                        ['deliverable', 'risky', 'unknown'],
-                                        'max-reach'
-                                      )
-                                    }
-                                  >
-                                    Max Reach
-                                  </DropdownItem>
-                                  <DropdownItem
-                                    key="deliverable"
-                                    description="Deliverable emails only"
-                                    startContent={
-                                      <PiShieldCheckDuotone className="text-2xl text-success" />
-                                    }
-                                    onClick={() =>
-                                      downloadCsv(
-                                        list?.id,
-                                        list?.name,
-                                        ['deliverable'],
-                                        'deliverable'
-                                      )
-                                    }
-                                  >
-                                    Deliverable only
-                                  </DropdownItem>
-                                  <DropdownItem
-                                    key="bad"
-                                    description="Undeliverable emails only"
-                                    startContent={
-                                      <PiWarningDiamondDuotone className="text-2xl text-warning" />
-                                    }
-                                    onClick={() =>
-                                      downloadCsv(
-                                        list?.id,
-                                        list?.name,
-                                        ['undeliverable'],
-                                        'undeliverable'
-                                      )
-                                    }
-                                  >
-                                    Invalid Emails
-                                  </DropdownItem>
-                                </DropdownMenu>
-                              </Dropdown>
+                              <ExportBtn list={list} />
                             )}
                             <Dropdown>
                               <DropdownTrigger>
