@@ -18,7 +18,11 @@ function AppLayout({ children }) {
   }, [])
 
   return (
-    <div className={`flex ${!showSidebar && 'flex-col'} h-screen w-screen`}>
+    <div
+      className={`flex ${
+        !showSidebar && 'flex-col'
+      } h-screen w-screen overflow-hidden`}
+    >
       {showSidebar && <Sidebar />}
       {!showSidebar && <Appbar />}
       {children}

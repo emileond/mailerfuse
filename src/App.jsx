@@ -15,7 +15,7 @@ import CurrentWorkspaceContext from './context/currentWorkspace.js'
 import BlogPage from './pages/Blog.jsx'
 import BlogPost from './pages/BlogPost.jsx'
 import ApiDocsPage from './pages/ApiDocs.jsx'
-import ApiPage from './pages/Api.jsx'
+import ApiPage from './pages/ApiKeys.jsx'
 import TeamPage from './pages/Team.jsx'
 import IntegrationsPage from './pages/Integrations.jsx'
 import SettingsPage from './pages/Settings.jsx'
@@ -74,7 +74,7 @@ function App() {
       ),
     },
     {
-      path: '/api',
+      path: '/keys',
       element: (
         <ProtectedRoute>
           <ApiPage />
@@ -116,7 +116,9 @@ function App() {
       <CurrentWorkspaceContext.Provider
         value={[currentWorkspace, setCurrentWorkspace]}
       >
-        {isLoading && <Progress size="sm" isIndeterminate />}
+        {isLoading && (
+          <Progress aria-label="loading" size="sm" isIndeterminate />
+        )}
         <RouterProvider router={router} />
         <Toaster position="top-center" />
       </CurrentWorkspaceContext.Provider>

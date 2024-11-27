@@ -29,6 +29,7 @@ function WorkspaceUsageCard() {
             maxValue={25000}
             value={credits?.available_credits}
             className="my-2"
+            aria-label="credits usage"
           />
           <p className="p-1 font-semibold text-secondary text-sm">Get more</p>
         </CardBody>
