@@ -59,48 +59,50 @@ function ApiKeyCard({ apiKey }) {
 
   return (
     <>
-      <Card key={apiKey.id} shadow="sm">
+      <Card shadow="sm">
         <CardBody className="flex flex-col gap-3 font-medium">
           {apiKey.name}
-          <div className="w-full flex gap-3 items-center">
-            <Code size="lg" className="grow">
+          <div className="w-full flex flex-wrap gap-3 items-center">
+            <Code size="lg" className="basis-3/6 grow shrink overflow-hidden">
               {revealedKey ? apiKey.key : '•'.repeat(apiKey.key.length)}
             </Code>
-            <Tooltip content="Copy">
-              <Button
-                variant="light"
-                size="md"
-                isIconOnly
-                onClick={copyToClipboard}
-              >
-                <RiFileCopyLine className="text-lg" />
-              </Button>
-            </Tooltip>
-            <Tooltip content={revealedKey ? 'Hide key' : 'Reveal key'}>
-              <Button
-                variant="light"
-                size="md"
-                isIconOnly
-                onClick={toggleRevealKey}
-              >
-                {revealedKey ? (
-                  <RiEyeOffLine className="text-lg" />
-                ) : (
-                  <RiEyeLine className="text-lg" />
-                )}
-              </Button>
-            </Tooltip>
-            <Tooltip content="Delete">
-              <Button
-                color="danger"
-                variant="light"
-                size="md"
-                isIconOnly
-                onClick={onOpen}
-              >
-                <RiDeleteBin6Line className="text-lg" />
-              </Button>
-            </Tooltip>
+            <div className="flex gap-1">
+              <Tooltip content="Copy">
+                <Button
+                  variant="light"
+                  size="md"
+                  isIconOnly
+                  onClick={copyToClipboard}
+                >
+                  <RiFileCopyLine className="text-lg" />
+                </Button>
+              </Tooltip>
+              <Tooltip content={revealedKey ? 'Hide key' : 'Reveal key'}>
+                <Button
+                  variant="light"
+                  size="md"
+                  isIconOnly
+                  onClick={toggleRevealKey}
+                >
+                  {revealedKey ? (
+                    <RiEyeOffLine className="text-lg" />
+                  ) : (
+                    <RiEyeLine className="text-lg" />
+                  )}
+                </Button>
+              </Tooltip>
+              <Tooltip content="Delete">
+                <Button
+                  color="danger"
+                  variant="light"
+                  size="md"
+                  isIconOnly
+                  onClick={onOpen}
+                >
+                  <RiDeleteBin6Line className="text-lg" />
+                </Button>
+              </Tooltip>
+            </div>
           </div>
         </CardBody>
       </Card>

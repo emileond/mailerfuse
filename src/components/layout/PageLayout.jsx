@@ -27,7 +27,7 @@ function PageLayout({
     >
       <div className={`w-full max-w-${maxW} flex flex-col gap-6`}>
         <div>
-          <div className="w-full flex justify-between gap-3">
+          <div className="w-full flex flex-wrap justify-between gap-3">
             <div className="flex gap-3">
               {backBtn && (
                 <Button isIconOnly variant="light" onPress={() => navigate(-1)}>
