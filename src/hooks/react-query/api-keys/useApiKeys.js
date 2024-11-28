@@ -26,7 +26,7 @@ export const useApiKeys = (currentWorkspace) => {
   })
 }
 
-// Function to create a new email list
+// Function to create a new api key
 const createApiKey = async ({ name, workspace_id }) => {
   const { error } = await supabaseClient.from('api_keys').insert([
     {
@@ -36,7 +36,7 @@ const createApiKey = async ({ name, workspace_id }) => {
   ])
 
   if (error) {
-    console.error('Error creating email list:', error)
+    console.error('Error creating api key:', error)
     throw new Error('Failed to create email list')
   }
 
@@ -49,6 +49,32 @@ export const useCreateApiKey = (currentWorkspace) => {
 
   return useMutation({
     mutationFn: createApiKey,
+    onSuccess: () => {
+      // Invalidate and refetch the email lists query for the team
+      queryClient.invalidateQueries(['apiKeys', currentWorkspace?.workspace_id])
+    },
+  })
+}
+
+// Function to delete an api key
+const deleteApiKey = async ({ id }) => {
+  console.log('Deleting api key with id:', id)
+  const { error } = await supabaseClient.from('api_keys').delete().eq('id', id)
+
+  if (error) {
+    console.error('Error deleting api key:', error)
+    throw new Error('Failed to create email list')
+  }
+
+  return
+}
+
+// Hook to delete an api key
+export const useDeleteApiKey = (currentWorkspace) => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: deleteApiKey,
     onSuccess: () => {
       // Invalidate and refetch the email lists query for the team
       queryClient.invalidateQueries(['apiKeys', currentWorkspace?.workspace_id])

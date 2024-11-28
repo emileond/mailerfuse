@@ -4,24 +4,27 @@ import useCurrentWorkspace from '../hooks/useCurrentWorkspace'
 import { useApiKeys } from '../hooks/react-query/api-keys/useApiKeys'
 import ApiKeyCard from '../components/auth/ApiKeyCard'
 import {
+  Button,
+  Input,
+  Link,
   Modal,
   ModalContent,
   ModalHeader,
   ModalBody,
   ModalFooter,
   useDisclosure,
-  Input,
-  Button,
 } from '@nextui-org/react'
 import { useForm } from 'react-hook-form'
 import { useCreateApiKey } from '../hooks/react-query/api-keys/useApiKeys'
 import toast from 'react-hot-toast'
+import EmptyState from '../components/EmptyState'
 
 function ApiKeysPage() {
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure()
   const [currentWorkspace] = useCurrentWorkspace()
   const { data } = useApiKeys(currentWorkspace)
-  const { mutateAsync: createApiKey } = useCreateApiKey(currentWorkspace)
+  const { mutateAsync: createApiKey, isPending } =
+    useCreateApiKey(currentWorkspace)
 
   const {
     register,
@@ -31,8 +34,6 @@ function ApiKeysPage() {
   } = useForm()
 
   const onSubmit = async (data) => {
-    onClose()
-    reset()
     await createApiKey(
       { name: data.name, workspace_id: currentWorkspace.workspace_id },
       {
@@ -44,6 +45,8 @@ function ApiKeysPage() {
         },
       }
     )
+    onClose()
+    reset()
   }
 
   return (
@@ -52,11 +55,30 @@ function ApiKeysPage() {
         title="API keys"
         maxW="2xl"
         primaryAction="Create key"
-        description="API keys allow you to automate actions on Mailerfuse from external services."
+        description="Automate actions on Mailerfuse from external services using the API"
         onClick={onOpen}
+        customElements={
+          <Button
+            as={Link}
+            href="https://docs.mailerfuse.com"
+            isExternal
+            variant="bordered"
+          >
+            API docs
+          </Button>
+        }
       >
         <div className="flex flex-col gap-3 mb-12">
-          {data && data.map((key) => <ApiKeyCard key={key.id} apiKey={key} />)}
+          {data?.length ? (
+            data.map((key) => <ApiKeyCard key={key.id} apiKey={key} />)
+          ) : (
+            <EmptyState
+              title="No API keys found"
+              description="Create an API key to get started"
+              primaryAction="Create key"
+              onClick={onOpen}
+            />
+          )}
         </div>
         <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
           <ModalContent>
@@ -74,10 +96,14 @@ function ApiKeysPage() {
                 />
               </ModalBody>
               <ModalFooter>
-                <Button variant="light" onPress={onClose}>
+                <Button
+                  variant="light"
+                  onPress={onClose}
+                  isDisabled={isPending}
+                >
                   Cancel
                 </Button>
-                <Button color="primary" type="submit">
+                <Button color="primary" type="submit" isLoading={isPending}>
                   Create key
                 </Button>
               </ModalFooter>

@@ -25,33 +25,35 @@ function PageLayout({
     <div
       className={`min-h-screen h-full bg-content1 px-6 py-9 grow flex justify-center overflow-y-auto`}
     >
-      <div className={`w-full max-w-${maxW} flex flex-col gap-6 `}>
-        <div className="w-full flex justify-between gap-3">
-          <div className="flex gap-3">
-            {backBtn && (
-              <Button isIconOnly variant="light" onPress={() => navigate(-1)}>
-                <RiArrowLeftLine fontSize="1.2rem" />
-              </Button>
-            )}
-            <div>
+      <div className={`w-full max-w-${maxW} flex flex-col gap-6`}>
+        <div>
+          <div className="w-full flex justify-between gap-3">
+            <div className="flex gap-3">
+              {backBtn && (
+                <Button isIconOnly variant="light" onPress={() => navigate(-1)}>
+                  <RiArrowLeftLine fontSize="1.2rem" />
+                </Button>
+              )}
               <h1 className="font-semibold mb-3">{title}</h1>
-              {description && (
-                <p className="font-medium text-sm text-default-500">
-                  {description}
-                </p>
+            </div>
+            <div className="flex gap-3">
+              {customElements}
+              {primaryAction && (
+                <Button
+                  onClick={handleOnclick}
+                  color="primary"
+                  className="font-medium"
+                  startContent={icon}
+                >
+                  {primaryAction}
+                </Button>
               )}
             </div>
           </div>
-          {customElements}
-          {primaryAction && (
-            <Button
-              onClick={handleOnclick}
-              color="primary"
-              className="font-medium"
-              startContent={icon}
-            >
-              {primaryAction}
-            </Button>
+          {description && (
+            <p className="font-medium text-sm text-default-500 mt-2">
+              {description}
+            </p>
           )}
         </div>
         <div>{children}</div>
