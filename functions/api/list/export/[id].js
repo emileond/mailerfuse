@@ -12,7 +12,7 @@ export async function onRequestGet(context) {
 
   const batchSize = 1000
   let start = 0
-  let hasMore = true
+  let hasMore = trueno
   const allData = []
 
   while (hasMore) {
