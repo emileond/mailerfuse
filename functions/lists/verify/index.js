@@ -137,7 +137,9 @@ export async function onRequestPost(context) {
 
 export async function onRequestGet(context) {
     const apiKey = context.request.headers.get('x-api-key');
-    const { id } = await context.request.json();
+
+    const url = new URL(context.request.url);
+    const id = url.searchParams.get('id');
 
     // basic error handling
     if (!id) {
@@ -146,14 +148,28 @@ export async function onRequestGet(context) {
         });
     }
 
+    const supabase = createClient(context.env.SUPABASE_URL, context.env.SUPABASE_SERVICE_KEY);
+
     // check if api key is valid
-    const validation = await validateApiKey(apiKey, context);
+    const validation = await validateApiKey(apiKey, context, supabase);
     if (!validation.isValid) {
         return validation.response;
     }
 
-    return new Response(JSON.stringify({ message: 'Hello, Bulk!' }), {
-        headers: { 'Content-Type': 'application/json' },
-        status: 200,
-    });
+    const { workspace_id } = validation.apiKeyData;
+
+    const { data, error } = await supabase
+        .from('lists')
+        .select('*')
+        .eq('id', id)
+        .eq('workspace_id', workspace_id)
+        .single();
+
+    if (error) {
+        return new Response(JSON.stringify({ error: error.message }), {
+            status: 500,
+        });
+    }
+
+    return new Response(JSON.stringify({ status: data.status, summary: data.summary }));
 }
