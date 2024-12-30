@@ -6,17 +6,17 @@ export async function onRequestPost(context) {
     const apiKey = context.request.headers.get('x-api-key');
     const { email } = await context.request.json();
 
-    // check if api key is valid
-    if (!apiKey) {
-        return new Response(JSON.stringify({ error: 'API key is missing' }), {
-            status: 401,
-        });
-    }
-
     // basic error handling
     if (!email) {
         return new Response(JSON.stringify({ error: 'Missing required fields' }), {
             status: 400,
+        });
+    }
+
+    // check if api key is valid
+    if (!apiKey) {
+        return new Response(JSON.stringify({ error: 'API key is missing' }), {
+            status: 401,
         });
     }
 
