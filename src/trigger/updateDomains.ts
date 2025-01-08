@@ -1,6 +1,7 @@
-import { logger, schedules, task } from '@trigger.dev/sdk/v3';
+import { logger, schedules } from '@trigger.dev/sdk/v3';
 import { createClient } from '@supabase/supabase-js';
 import { verifyRecords } from '../utils/verifyRecords';
+import { cacheDate } from '../utils/cacheDate';
 
 // Initialize Supabase client
 const supabase = createClient(
@@ -10,10 +11,8 @@ const supabase = createClient(
 
 export const emailVerificationTask = schedules.task({
     id: 'update-cache-dns',
-    cron: '0 * * * *',
+    cron: '0 */6 * * *',
     run: async () => {
-        const cacheDate = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString();
-
         // Fetch cached domains in one go
         const { data: cachedDomains, error: cacheError } = await supabase
             .from('domain_cache')
@@ -21,17 +20,25 @@ export const emailVerificationTask = schedules.task({
             .lte('last_updated', cacheDate)
             .limit(500);
 
+        logger.log(`Fetched ${cachedDomains?.length} domains to update.`);
+
         // Process each chunk
         for (const cDomain of cachedDomains) {
+            logger.log(`Updating DNS records for ${cDomain.domain}`);
             const recordsResult = await verifyRecords(cDomain.domain);
-            await supabase
+            console.log(recordsResult);
+            const { error } = await supabase
                 .from('domain_cache')
                 .update({
                     domain_status: recordsResult.domain_status,
                     mx_record: recordsResult.mx_record,
                     last_updated: new Date(Date.now()).toISOString(),
                 })
-                .eq('id', cDomain.id);
+                .eq('domain', cDomain.domain);
+
+            if (error) {
+                logger.error(`Error inserting data for ${cDomain.domain}: ${error.message}`);
+            }
         }
 
         // Return a success message

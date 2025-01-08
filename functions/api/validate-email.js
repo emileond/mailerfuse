@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { validateEmail } from '../../src/utils/validateEmail';
 import { verifyRecords } from '../../src/utils/verifyRecords.js';
+import { cacheDate } from '../../src/utils/cacheDate.js';
 
 export async function onRequestPost(context) {
     const { email, session, workspace_id } = await context.request.json();
@@ -85,7 +86,6 @@ export async function onRequestPost(context) {
         let score = validationResult.score;
 
         const domain = email.split('@')[1];
-        const cacheDate = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString();
 
         const { data: cachedData } = await supabase
             .from('domain_cache')
