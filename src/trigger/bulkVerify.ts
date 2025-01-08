@@ -2,6 +2,7 @@ import { logger, task } from '@trigger.dev/sdk/v3';
 import { createClient } from '@supabase/supabase-js';
 import { validateEmail } from '../utils/validateEmail';
 import { verifyRecords } from '../utils/verifyRecords';
+import { cacheDate } from '../utils/cacheDate';
 
 // Initialize Supabase client
 const supabase = createClient(
@@ -62,7 +63,6 @@ export const emailVerificationTask = task({
 
         const batchSize = 250;
         const chunks = chunkArray(data, batchSize);
-        const cacheDate = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString();
 
         // Process each chunk
         for (const chunk of chunks) {

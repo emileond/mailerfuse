@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { validateEmail } from '../../../src/utils/validateEmail.js';
 import { verifyRecords } from '../../../src/utils/verifyRecords.js';
+import { cacheDate } from '../../../src/utils/cacheDate.js';
 
 export async function onRequestPost(context) {
     const apiKey = context.request.headers.get('x-api-key');
@@ -96,16 +97,12 @@ export async function onRequestPost(context) {
 
     const domain = email.split('@')[1];
 
-    const cacheDate = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString();
-
     const { data: cachedData } = await supabase
         .from('domain_cache')
         .select('*')
         .eq('domain', domain)
         .gte('last_updated', cacheDate)
         .single();
-
-    console.log(cacheDate);
 
     if (cachedData) {
         const { domain_status, mx_record } = cachedData;
