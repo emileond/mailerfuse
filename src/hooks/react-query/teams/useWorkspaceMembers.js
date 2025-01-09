@@ -81,27 +81,25 @@ export const useAddWorkspaceMember = (currentWorkspace) => {
 };
 
 // Function to delete an api key
-const deleteApiKey = async ({ id }) => {
+const deleteWorkspaceMember = async ({ id }) => {
     console.log('Deleting api key with id:', id);
-    const { error } = await supabaseClient.from('api_keys').delete().eq('id', id);
+    const { error } = await supabaseClient.from('workspace_members').delete().eq('id', id);
 
     if (error) {
-        console.error('Error deleting api key:', error);
-        throw new Error('Failed to create email list');
+        console.error('Error deleting:', error);
+        throw new Error('Failed to delete member');
     }
-
-    return;
 };
 
 // Hook to delete an api key
-export const useDeleteApiKey = (currentWorkspace) => {
+export const useDeleteWorkspaceMember = (currentWorkspace) => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: deleteApiKey,
+        mutationFn: deleteWorkspaceMember,
         onSuccess: () => {
             // Invalidate and refetch the email lists query for the team
-            queryClient.invalidateQueries(['apiKeys', currentWorkspace?.workspace_id]);
+            queryClient.invalidateQueries(['workspaceMembers', currentWorkspace?.workspace_id]);
         },
     });
 };
