@@ -72,9 +72,9 @@ function TeamPage() {
                         data.map((member) => <MemberCard key={member.user_id} member={member} />)
                     ) : (
                         <EmptyState
-                            title="No API keys found"
-                            description="Create an API key to get started"
-                            primaryAction="Create key"
+                            title="No team members found"
+                            description="Invite team members to get started"
+                            primaryAction="Invite member"
                             onClick={onOpen}
                         />
                     )}
