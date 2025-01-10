@@ -8,7 +8,7 @@ export async function onRequestPost(context) {
 
     // check if api key is valid
     if (!apiKey || apiKey !== context.env.WEBHOOK_API_KEY) {
-        return new Response(JSON.stringify({ error: 'API key is invalid or missing' }), {
+        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
             status: 401,
         });
     }
