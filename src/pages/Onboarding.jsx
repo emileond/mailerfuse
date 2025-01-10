@@ -62,7 +62,7 @@ function OnboardingPage() {
                             navigate('/dashboard');
                         },
                         onError: (error) => {
-                            toast.error(error.message);
+                            toast.error(error?.message);
                         },
                     },
                 );
