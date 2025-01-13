@@ -55,6 +55,7 @@ function OnboardingPage() {
                         invite_email: invite.email,
                         role: invite.role,
                         workspace_id: currentWorkspace.workspace_id,
+                        invited_by: user.email,
                     },
                     {
                         onSuccess: () => {

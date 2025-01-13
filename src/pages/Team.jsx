@@ -21,8 +21,10 @@ import EmptyState from '../components/EmptyState';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import MemberCard from '../components/team/MemberCard';
+import { useUser } from '../hooks/react-query/user/useUser.js';
 
 function TeamPage() {
+    const { data: user } = useUser();
     const [currentWorkspace] = useCurrentWorkspace();
     const { data } = useWorkspaceMembers(currentWorkspace);
     const { mutateAsync: addWorkspaceMember, isPending } = useAddWorkspaceMember(currentWorkspace);
@@ -41,6 +43,7 @@ function TeamPage() {
                 invite_email: data.email,
                 role: data.role,
                 workspace_id: currentWorkspace.workspace_id,
+                invited_by: user.email,
             },
             {
                 onSuccess: () => {

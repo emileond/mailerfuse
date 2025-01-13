@@ -51,13 +51,14 @@ export const useWorkspaceMembers = (currentWorkspace) => {
 };
 
 // Function to add a new member
-const addWorkspaceMember = async ({ invite_email, role, workspace_id }) => {
+const addWorkspaceMember = async ({ invite_email, role, workspace_id, invited_by }) => {
     const { error } = await supabaseClient.from('workspace_members').insert([
         {
             invite_email,
             role,
             workspace_id,
             status: 'pending',
+            invited_by: invited_by,
         },
     ]);
 
