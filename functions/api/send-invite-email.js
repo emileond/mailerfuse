@@ -21,7 +21,12 @@ export async function onRequestPost(context) {
         });
     }
     const { invite_email: email, status, invited_by } = record;
-
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || !emailRegex.test(email)) {
+        return new Response(JSON.stringify({ error: 'Invalid email format' }), {
+            status: 400,
+        });
+    }
     if (status !== 'pending') {
         return new Response(JSON.stringify({ error: 'Invite not pending' }), {
             status: 400,
