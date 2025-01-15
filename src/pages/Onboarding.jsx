@@ -150,7 +150,23 @@ function OnboardingPage() {
                                         label="Email"
                                         type="email"
                                         fullWidth
-                                        {...registerInvite(`${index}.email`, {})}
+                                        {...registerInvite(`${index}.email`, {
+                                            validate: {
+                                                format: async (value) => {
+                                                    if (!value) return true; // Allow empty fields
+                                                    const result = await validateEmail(value);
+                                                    return !result.syntax_error || 'Invalid email format';
+                                                },
+                                                duplicate: (value, formValues) => {
+                                                    if (!value) return true;
+                                                    const emails = Object.values(formValues)
+                                                        .filter(v => v?.email)
+                                                        .map(v => v.email);
+                                                    return emails.filter(e => e === value).length === 1 || 
+                                                        'Duplicate email address';
+                                                }
+                                            }
+                                        })}
                                         className="basis-4/3"
                                     />
                                     <Select
