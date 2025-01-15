@@ -51,6 +51,8 @@ function OnboardingPage() {
     // Function to handle sending invites
     const handleSendInvites = async (inviteData) => {
         const invites = Object.values(inviteData);
+        const results = { success: 0, failed: 0 };
+        const errors = [];
 
         for (const invite of invites.filter((inv) => inv.email && inv.role)) {
             const result = await validateEmail(invite.email);
@@ -64,18 +66,27 @@ function OnboardingPage() {
                     },
                     {
                         onSuccess: () => {
-                            toast.success('Team member invited');
-                            navigate('/dashboard');
+                            results.success++;
                         },
                         onError: (error) => {
-                            toast.error(error?.message);
+                            results.failed++;
+                            errors.push(`${invite.email}: ${error?.message}`);
                         },
                     },
                 );
             }
         }
-        // const { teamEmails } = inviteData;
-        // Handle sending invites (e.g., API call)
+        // Show summary toast
+        if (results.success > 0) {
+            toast.success(`Successfully invited ${results.success} team member(s)`);
+        }
+        if (results.failed > 0) {
+            toast.error(`Failed to invite ${results.failed} team member(s)`);
+            console.error('Invite errors:', errors);
+        }
+
+        // Navigate after all invites are processed
+        navigate('/dashboard');
     };
 
     // Function to skip inviting team members
