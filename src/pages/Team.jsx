@@ -82,7 +82,11 @@ function TeamPage() {
                     </span>
                     {workspaceMembers?.length ? (
                         workspaceMembers.map((member) => (
-                            <MemberCard key={member.user_id} member={member} />
+                            <MemberCard
+                                key={member.user_id}
+                                member={member}
+                                onEditMember={(m) => console.log(m)}
+                            />
                         ))
                     ) : (
                         <EmptyState

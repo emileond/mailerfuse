@@ -20,7 +20,7 @@ import {
 } from '../../hooks/react-query/teams/useWorkspaceMembers.js';
 import useCurrentWorkspace from '../../hooks/useCurrentWorkspace';
 
-function MemberCard({ member }) {
+function MemberCard({ member, onEditMember }) {
     const [currentWorkspace] = useCurrentWorkspace();
     const { onOpen, isOpen, onOpenChange, onClose } = useDisclosure();
     const { mutateAsync: deleteWorkspaceMember, isPending: isDeleting } =
@@ -56,6 +56,10 @@ function MemberCard({ member }) {
             },
         );
         onClose();
+    };
+
+    const handleOnEdit = () => {
+        onEditMember(member);
     };
 
     return (
@@ -96,7 +100,7 @@ function MemberCard({ member }) {
                                 </Tooltip>
                             )}
                             <Tooltip content="Edit">
-                                <Button variant="light" size="md" isIconOnly>
+                                <Button variant="light" size="md" isIconOnly onPress={handleOnEdit}>
                                     <RiEditLine className="text-lg" />
                                 </Button>
                             </Tooltip>
