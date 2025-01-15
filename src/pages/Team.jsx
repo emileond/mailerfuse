@@ -26,7 +26,7 @@ import { useUser } from '../hooks/react-query/user/useUser.js';
 function TeamPage() {
     const { data: user } = useUser();
     const [currentWorkspace] = useCurrentWorkspace();
-    const { data } = useWorkspaceMembers(currentWorkspace);
+    const { data: workspaceMembers } = useWorkspaceMembers(currentWorkspace);
     const { mutateAsync: addWorkspaceMember, isPending } = useAddWorkspaceMember(currentWorkspace);
     const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
 
@@ -38,22 +38,30 @@ function TeamPage() {
     } = useForm();
 
     const onSubmit = async (data) => {
-        await addWorkspaceMember(
-            {
-                invite_email: data.email,
-                role: data.role,
-                workspace_id: currentWorkspace.workspace_id,
-                invited_by: user.email,
-            },
-            {
-                onSuccess: () => {
-                    toast.success('Team member invited');
-                },
-                onError: (error) => {
-                    toast.error(error.message);
-                },
-            },
+        // Check if email is already invited
+        const isDuplicate = workspaceMembers?.some(
+            (member) => member.invite_email === data.email || member.email === data.email,
         );
+        if (isDuplicate) {
+            toast.error('This user is already invited');
+        } else {
+            await addWorkspaceMember(
+                {
+                    invite_email: data.email,
+                    role: data.role,
+                    workspace_id: currentWorkspace.workspace_id,
+                    invited_by: user.email,
+                },
+                {
+                    onSuccess: () => {
+                        toast.success('Team member invited');
+                    },
+                    onError: (error) => {
+                        toast.error(error.message);
+                    },
+                },
+            );
+        }
         onClose();
         reset();
     };
@@ -69,10 +77,13 @@ function TeamPage() {
             >
                 <div className="flex flex-col gap-3 mb-12">
                     <span className="text-sm text-default-600">
-                        {data?.length} {data?.length === 1 ? 'member' : 'members'}
+                        {workspaceMembers?.length}{' '}
+                        {workspaceMembers?.length === 1 ? 'member' : 'members'}
                     </span>
-                    {data?.length ? (
-                        data.map((member) => <MemberCard key={member.user_id} member={member} />)
+                    {workspaceMembers?.length ? (
+                        workspaceMembers.map((member) => (
+                            <MemberCard key={member.user_id} member={member} />
+                        ))
                     ) : (
                         <EmptyState
                             title="No team members found"
@@ -94,6 +105,7 @@ function TeamPage() {
                                     <Input
                                         {...register('email', { required: true })}
                                         label="Email"
+                                        type="email"
                                         isInvalid={errors.email}
                                         errorMessage="Email is required"
                                         className="basis-2/3 grow"

@@ -11,7 +11,6 @@ export async function onRequestPost(context) {
     }
 
     const body = await context.request.json();
-    console.log(body);
     const { type, record } = body;
 
     // Basic 400 error handling
@@ -51,9 +50,6 @@ export async function onRequestPost(context) {
                     lists: [1],
                 },
             });
-
-            subscriberData = await addSubscriberRes.json();
-            console.log(subscriberData);
         } catch (error) {
             if (error.response && error.response.status === 409) {
                 console.log('E-mail already exists, sending email invite.');
