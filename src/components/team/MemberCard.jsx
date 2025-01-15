@@ -12,9 +12,12 @@ import {
     useDisclosure,
     User,
 } from '@nextui-org/react';
-import { RiEditLine, RiDeleteBin6Line } from 'react-icons/ri';
+import { RiEditLine, RiDeleteBin6Line, RiMailSendLine } from 'react-icons/ri';
 import toast from 'react-hot-toast';
-import { useDeleteWorkspaceMember } from '../../hooks/react-query/teams/useWorkspaceMembers.js';
+import {
+    useDeleteWorkspaceMember,
+    useUpdateWorkspaceMember,
+} from '../../hooks/react-query/teams/useWorkspaceMembers.js';
 import useCurrentWorkspace from '../../hooks/useCurrentWorkspace';
 
 function MemberCard({ member }) {
@@ -22,6 +25,23 @@ function MemberCard({ member }) {
     const { onOpen, isOpen, onOpenChange, onClose } = useDisclosure();
     const { mutateAsync: deleteWorkspaceMember, isPending: isDeleting } =
         useDeleteWorkspaceMember(currentWorkspace);
+    const { mutateAsync: updateWorkspaceMember, isPending: isUpdating } =
+        useUpdateWorkspaceMember(currentWorkspace);
+
+    const handleUpdate = async (role, isResendEmail) => {
+        await updateWorkspaceMember(
+            { id: member.id, role: isResendEmail ? member.role : role },
+            {
+                onSuccess: () => {
+                    toast.success(isResendEmail ? 'Invitation sent' : 'Member updated');
+                },
+                onError: (error) => {
+                    toast.error(error.message);
+                },
+            },
+        );
+        // close modal
+    };
 
     const handleDelete = async () => {
         await deleteWorkspaceMember(
@@ -42,9 +62,9 @@ function MemberCard({ member }) {
         <>
             <Card shadow="sm">
                 <CardBody>
-                    <div className="flex gap-3 items-center justify-between">
+                    <div className="flex gap-1 items-center justify-between">
                         <User
-                            name={member.name || 'User'}
+                            name={member.name || member.email.split('@')[0]}
                             description={member.email}
                             avatarProps={{
                                 src: member.avatar,
@@ -58,6 +78,23 @@ function MemberCard({ member }) {
                             {member.status}
                         </Chip>
                         <div className="flex gap-3 items-center">
+                            {member.status === 'pending' && (
+                                <Tooltip content="Resend invite">
+                                    <Button
+                                        variant="light"
+                                        size="md"
+                                        isIconOnly
+                                        isDisabled={
+                                            new Date(member.updated_at).getTime() >
+                                            Date.now() - 24 * 60 * 60 * 1000
+                                        }
+                                        onPress={() => handleUpdate(member.email, true)}
+                                        isLoading={isUpdating}
+                                    >
+                                        <RiMailSendLine className="text-lg" />
+                                    </Button>
+                                </Tooltip>
+                            )}
                             <Tooltip content="Edit">
                                 <Button variant="light" size="md" isIconOnly>
                                     <RiEditLine className="text-lg" />

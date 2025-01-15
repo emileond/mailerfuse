@@ -59,6 +59,7 @@ const addWorkspaceMember = async ({ invite_email, role, workspace_id, invited_by
             workspace_id,
             status: 'pending',
             invited_by: invited_by,
+            updated_at: new Date(),
         },
     ]);
 
@@ -68,12 +69,44 @@ const addWorkspaceMember = async ({ invite_email, role, workspace_id, invited_by
     }
 };
 
-// Hook to create a new api key
+// Hook to create a new member
 export const useAddWorkspaceMember = (currentWorkspace) => {
     const queryClient = useQueryClient();
 
     return useMutation({
         mutationFn: addWorkspaceMember,
+        onSuccess: () => {
+            // Invalidate and refetch
+            queryClient.invalidateQueries(['workspaceMembers', currentWorkspace?.workspace_id]);
+        },
+    });
+};
+
+// Function to resend invite (force update)
+const updateWorkspaceMember = async ({ id, role, workspace_id }) => {
+    const { error } = await supabaseClient
+        .from('workspace_members')
+        .update([
+            {
+                role,
+                workspace_id,
+                updated_at: new Date(),
+            },
+        ])
+        .eq('id', id);
+
+    if (error) {
+        console.error('Error updating workspace member:', error);
+        throw new Error(error.message);
+    }
+};
+
+// Hook to create a new member
+export const useUpdateWorkspaceMember = (currentWorkspace) => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: updateWorkspaceMember,
         onSuccess: () => {
             // Invalidate and refetch
             queryClient.invalidateQueries(['workspaceMembers', currentWorkspace?.workspace_id]);
