@@ -28,11 +28,7 @@ function OnboardingPage() {
         formState: { errors },
     } = useForm();
 
-    const {
-        register: registerInvite,
-        handleSubmit: handleInviteSubmit,
-        formState: { errors: inviteErrors },
-    } = useForm();
+    const { register: registerInvite, handleSubmit: handleInviteSubmit } = useForm();
 
     // Function to handle workspace creation
     const handleCreateWorkspace = async (formData) => {
@@ -171,7 +167,7 @@ function OnboardingPage() {
                                 </div>
                             ))}
                             <div className="flex justify-end gap-3 mt-9">
-                                <Button variant="light" color="primary" onClick={handleSkip}>
+                                <Button variant="light" color="primary" onPress={handleSkip}>
                                     Skip for now
                                 </Button>
                                 <Button color="primary" type="submit" isLoading={isAddPending}>
