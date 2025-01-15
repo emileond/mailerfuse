@@ -37,10 +37,15 @@ function OnboardingPage() {
     // Function to handle workspace creation
     const handleCreateWorkspace = async (formData) => {
         const { workspaceName } = formData;
-        await createWorkspace({
-            name: workspaceName,
-            user_id: user.id,
-        });
+        try {
+            await createWorkspace({
+                name: workspaceName,
+                user_id: user.id,
+            });
+            toast.success('Workspace created successfully');
+        } catch (error) {
+            toast.error(error?.message || 'Failed to create workspace, try again');
+        }
     };
 
     // Function to handle sending invites

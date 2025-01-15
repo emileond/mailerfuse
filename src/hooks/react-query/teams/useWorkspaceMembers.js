@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabaseClient } from '../../../lib/supabase';
 
 // Fetch email lists for a specific team
@@ -30,14 +30,12 @@ const fetchWorkspaceMembers = async (workspace_id) => {
     }
 
     // Merge workspace members with their corresponding profile emails
-    const result = members.map((member) => ({
+    return members.map((member) => ({
         ...member,
         email:
             profiles.find((profile) => profile.user_id === member.user_id)?.email ||
             member.invite_email,
     }));
-
-    return result;
 };
 
 // Hook to fetch all workspace members
@@ -52,6 +50,9 @@ export const useWorkspaceMembers = (currentWorkspace) => {
 
 // Function to add a new member
 const addWorkspaceMember = async ({ invite_email, role, workspace_id, invited_by }) => {
+    if (!invite_email || !role || !workspace_id || !invited_by) {
+        throw new Error('Missing required fields');
+    }
     const { error } = await supabaseClient.from('workspace_members').insert([
         {
             invite_email,
@@ -116,7 +117,20 @@ export const useUpdateWorkspaceMember = (currentWorkspace) => {
 
 // Function to delete an api key
 const deleteWorkspaceMember = async ({ id }) => {
-    console.log('Deleting api key with id:', id);
+    if (!id) {
+        throw new Error('Member ID is required');
+    }
+    // Prevent owner deletion
+    const { data: member } = await supabaseClient
+        .from('workspace_members')
+        .select('role')
+        .eq('id', id)
+        .single();
+
+    if (member?.role === 'owner') {
+        throw new Error('Cannot delete workspace owner');
+    }
+
     const { error } = await supabaseClient.from('workspace_members').delete().eq('id', id);
 
     if (error) {

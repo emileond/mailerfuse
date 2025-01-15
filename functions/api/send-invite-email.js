@@ -35,10 +35,8 @@ export async function onRequestPost(context) {
     try {
         const addSubscriberUrl = 'https://listmonk.mailerfuse.com/api/subscribers';
 
-        let subscriberData;
-
         try {
-            const addSubscriberRes = await ky.post(addSubscriberUrl, {
+            await ky.post(addSubscriberUrl, {
                 headers: {
                     Accept: 'application/json',
                     'Content-Type': 'application/json',
