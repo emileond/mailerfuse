@@ -31,7 +31,7 @@ function TeamPage() {
     const [currentWorkspace] = useCurrentWorkspace();
     const { data: workspaceMembers } = useWorkspaceMembers(currentWorkspace);
     const { mutateAsync: addWorkspaceMember, isPending } = useAddWorkspaceMember(currentWorkspace);
-    const { mutateAsync: updateWorkspaceMember, isPending: isUpdating } =
+    const { mutateAsync: updateWorkspaceMember } =
         useUpdateWorkspaceMember(currentWorkspace);
     const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
     const [editMember, setEditMember] = useState();
