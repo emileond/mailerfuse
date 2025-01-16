@@ -24,15 +24,13 @@ import toast from 'react-hot-toast';
 import MemberCard from '../components/team/MemberCard';
 import { useUser } from '../hooks/react-query/user/useUser.js';
 import { useState } from 'react';
-import log from 'eslint-plugin-react/lib/util/log.js';
 
 function TeamPage() {
     const { data: user } = useUser();
     const [currentWorkspace] = useCurrentWorkspace();
     const { data: workspaceMembers } = useWorkspaceMembers(currentWorkspace);
     const { mutateAsync: addWorkspaceMember, isPending } = useAddWorkspaceMember(currentWorkspace);
-    const { mutateAsync: updateWorkspaceMember } =
-        useUpdateWorkspaceMember(currentWorkspace);
+    const { mutateAsync: updateWorkspaceMember } = useUpdateWorkspaceMember(currentWorkspace);
     const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
     const [editMember, setEditMember] = useState();
 
@@ -121,7 +119,7 @@ function TeamPage() {
                     {workspaceMembers?.length ? (
                         workspaceMembers.map((member) => (
                             <MemberCard
-                                key={member.user_id}
+                                key={member.id}
                                 member={member}
                                 onEditMember={(m) => handleEditMember(m)}
                             />
