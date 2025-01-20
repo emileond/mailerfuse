@@ -13,8 +13,13 @@ import {
     Tab,
 } from '@nextui-org/react';
 import { useEffect, useState } from 'react';
+import { useUser } from '../hooks/react-query/user/useUser.js';
+import { useUserInvitations } from '../hooks/react-query/user/useUserInvitations.js';
+import InvitationCard from '../components/team/InvitationCard.jsx';
 
 function ProfilePage() {
+    const { data: user } = useUser();
+    const { data: invitations } = useUserInvitations(user);
     const navigate = useNavigate();
     const { tab } = useParams();
     const [activeTab, setActiveTab] = useState('profile');
@@ -54,11 +59,9 @@ function ProfilePage() {
                     </Tab>
                     <Tab key="invitations" title="Invitations">
                         <div className="flex flex-col gap-3">
-                            <Card shadow="sm">
-                                <CardBody>
-                                    <Input label="name" type="text" />
-                                </CardBody>
-                            </Card>
+                            {invitations?.map((inv) => (
+                                <InvitationCard key={inv.id} invitation={inv} />
+                            ))}
                         </div>
                     </Tab>
                 </Tabs>
