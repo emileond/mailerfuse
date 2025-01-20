@@ -6,7 +6,7 @@ import {
   CardFooter,
   CardHeader,
   Slider,
-} from '@nextui-org/react'
+} from "@heroui/react"
 import { RiCheckFill } from 'react-icons/ri'
 
 function VolumePricingCard() {

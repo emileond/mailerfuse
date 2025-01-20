@@ -5,7 +5,7 @@ import {
   CardFooter,
   CardHeader,
   Divider,
-} from '@nextui-org/react'
+} from "@heroui/react"
 import { RiCheckFill } from 'react-icons/ri'
 
 function PricingCard({

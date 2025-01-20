@@ -11,7 +11,7 @@ import {
     Tooltip,
     useDisclosure,
     User,
-} from '@nextui-org/react';
+} from "@heroui/react";
 import { RiEditLine, RiDeleteBin6Line, RiMailSendLine } from 'react-icons/ri';
 import toast from 'react-hot-toast';
 import {

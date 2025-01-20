@@ -11,7 +11,7 @@ import {
     useDisclosure,
     Select,
     SelectItem,
-} from '@nextui-org/react';
+} from "@heroui/react";
 import useCurrentWorkspace from '../hooks/useCurrentWorkspace';
 import {
     useWorkspaceMembers,

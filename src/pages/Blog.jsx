@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import NavBar from '../components/marketing/Nav'
-import { Card, CardBody, CardFooter, Image } from '@nextui-org/react'
+import { Card, CardBody, CardFooter, Image } from "@heroui/react"
 const posts = import.meta.glob('../../blog/*.mdx', { eager: true })
 
 function BlogPage() {

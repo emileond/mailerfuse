@@ -4,7 +4,7 @@ import { useUser } from '../hooks/react-query/user/useUser';
 import { useCreateWorkspace, useWorkspaces } from '../hooks/react-query/teams/useWorkspaces';
 import { useNavigate } from 'react-router-dom';
 import PageLayout from '../components/layout/PageLayout';
-import { Button, Input, Select, SelectItem } from '@nextui-org/react';
+import { Button, Input, Select, SelectItem } from "@heroui/react";
 import { PiWarningBold } from 'react-icons/pi';
 import { validateEmail } from '../utils/validateEmail.js';
 import useCurrentWorkspace from '../hooks/useCurrentWorkspace';

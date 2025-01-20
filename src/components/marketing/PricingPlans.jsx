@@ -1,4 +1,4 @@
-import { Button, ButtonGroup, Chip } from '@nextui-org/react'
+import { Button, ButtonGroup, Chip } from "@heroui/react"
 import PricingCard from './PricingCard'
 import { useState } from 'react'
 

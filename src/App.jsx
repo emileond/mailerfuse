@@ -6,7 +6,7 @@ import LandingPage from './pages/Landing.jsx';
 import AuthPage from './pages/Auth.jsx';
 import NotFoundPage from './pages/404.jsx';
 import { Toaster } from 'react-hot-toast';
-import { Progress } from '@nextui-org/react';
+import { Progress } from "@heroui/react";
 import { useUser } from './hooks/react-query/user/useUser.js';
 import ListDetailsPage from './pages/ListDetailsPage.jsx';
 import OnboardingPage from './pages/Onboarding.jsx';

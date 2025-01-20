@@ -1,7 +1,7 @@
 import NavBar from '../components/marketing/Nav'
 import { useState } from 'react'
 import { mdxComponents } from '../utils/mdxComponents.jsx'
-import { Listbox, ListboxItem } from '@nextui-org/react'
+import { Listbox, ListboxItem } from "@heroui/react"
 
 // Correct way to import all MDX files in a folder
 const docs = import.meta.glob('../../docs/*.mdx', { eager: true })

@@ -1,4 +1,4 @@
-import { Button, Card, CardBody, Chip, useDisclosure } from '@nextui-org/react';
+import { Button, Card, CardBody, Chip, useDisclosure } from "@heroui/react";
 import toast from 'react-hot-toast';
 import {
     useDeleteWorkspaceMember,

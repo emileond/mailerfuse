@@ -7,7 +7,7 @@ import {
     DropdownSection,
     DropdownTrigger,
     User,
-} from '@nextui-org/react';
+} from "@heroui/react";
 import {
     RiSunLine,
     RiMoonClearLine,

@@ -1,5 +1,5 @@
-import { Button } from '@nextui-org/button'
-import { Chip } from '@nextui-org/react'
+import { Button } from "@heroui/button"
+import { Chip } from "@heroui/react"
 
 export default function Hero() {
   return (

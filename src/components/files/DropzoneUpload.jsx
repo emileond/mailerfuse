@@ -1,6 +1,6 @@
 import { useDropzone } from 'react-dropzone'
 import { useCallback } from 'react'
-import { Button } from '@nextui-org/react'
+import { Button } from "@heroui/react"
 import toast from 'react-hot-toast'
 import { useDarkMode } from '../../hooks/theme/useDarkMode'
 import { useHotkeys } from 'react-hotkeys-hook'

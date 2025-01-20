@@ -1,7 +1,7 @@
 import emptyLight from '/empty-states/light/empty.svg'
 import emptyDark from '/empty-states/dark/empty.svg'
 import { Link } from 'react-router-dom'
-import { Button, Image } from '@nextui-org/react'
+import { Button, Image } from "@heroui/react"
 import Logo from '../components/Logo'
 import { useDarkMode } from '../hooks/theme/useDarkMode'
 

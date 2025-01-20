@@ -11,7 +11,7 @@ import {
     Input,
     Tabs,
     Tab,
-} from '@nextui-org/react';
+} from "@heroui/react";
 import { useEffect, useState } from 'react';
 import { useUser } from '../hooks/react-query/user/useUser.js';
 import { useUserInvitations } from '../hooks/react-query/user/useUserInvitations.js';

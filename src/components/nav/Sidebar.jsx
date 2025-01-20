@@ -1,4 +1,4 @@
-import { Button, Divider } from '@nextui-org/react'
+import { Button, Divider } from "@heroui/react"
 import { Link, useLocation } from 'react-router-dom'
 import Logo from '../Logo'
 import { navItems } from './navItems'
