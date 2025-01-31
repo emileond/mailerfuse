@@ -25,18 +25,23 @@ export const useUserInvitations = (user) => {
 };
 
 // Function to update invitation
+const VALID_STATUSES = ['active', 'declined', 'pending'];
+
 const updateUserInvitation = async ({ id, status, user_id }) => {
+    if (!VALID_STATUSES.includes(status)) {
+        throw new Error(`Invalid status: ${status}. Must be one of: ${VALID_STATUSES.join(', ')}`);
+    }
+
     const { error } = await supabaseClient
         .from('workspace_members')
         .update([
             {
                 status,
                 user_id,
-                updated_at: new Date(),
+                updated_at: 'now()', // Use database timestamp
             },
         ])
         .eq('id', id);
-
     if (error) {
         console.error('Error updating workspace member:', error);
         throw new Error(error.message);
