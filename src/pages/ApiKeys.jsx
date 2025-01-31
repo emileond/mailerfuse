@@ -13,7 +13,7 @@ import {
   ModalBody,
   ModalFooter,
   useDisclosure,
-} from '@nextui-org/react'
+} from "@heroui/react"
 import { useForm } from 'react-hook-form'
 import { useCreateApiKey } from '../hooks/react-query/api-keys/useApiKeys'
 import toast from 'react-hot-toast'

@@ -8,7 +8,7 @@ import {
   NavbarMenu,
   NavbarMenuItem,
   Link,
-} from '@nextui-org/react'
+} from "@heroui/react"
 import Logo from '../Logo.jsx'
 import { navItems } from './navItems.jsx'
 import { Link as RouterLink } from 'react-router-dom'

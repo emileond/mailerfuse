@@ -3,7 +3,7 @@ import AppLayout from '../components/layout/AppLayout'
 import PageLayout from '../components/layout/PageLayout'
 import useCurrentWorkspace from '../hooks/useCurrentWorkspace'
 import { useEmailLists } from '../hooks/react-query/email-lists/useEmailLists'
-import { Card, CardBody, CardHeader, Chip, Divider } from '@nextui-org/react'
+import { Card, CardBody, CardHeader, Chip, Divider } from "@heroui/react"
 import { PiFileCsvDuotone } from 'react-icons/pi'
 import { useEffect, useState } from 'react'
 import { RiCircleFill } from 'react-icons/ri'
@@ -146,7 +146,7 @@ function ListDetailsPage() {
                         ].map((key, index) => (
                           <Cell
                             key={`cell-${index}`}
-                            fill={`hsl(var(--nextui-${getKeyColor(key)}-400`}
+                            fill={`hsl(var(--heroui-${getKeyColor(key)}-400`}
                           />
                         ))}
                       </Pie>

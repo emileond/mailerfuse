@@ -7,7 +7,7 @@ import {
   NavbarMenuToggle,
   NavbarMenu,
   NavbarMenuItem,
-} from '@nextui-org/react'
+} from "@heroui/react"
 import { Link } from 'react-router-dom'
 import ThemeSwitcher from '../theme/ThemeSwitcher'
 import { useUser } from '../../hooks/react-query/user/useUser'

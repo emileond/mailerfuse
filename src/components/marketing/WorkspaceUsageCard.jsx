@@ -1,4 +1,4 @@
-import { Card, CardBody, Progress } from '@nextui-org/react'
+import { Card, CardBody, Progress } from "@heroui/react"
 import useCurrentWorkspace from '../../hooks/useCurrentWorkspace'
 import { useWorkspaceCredits } from '../../hooks/react-query/credits/useWorkspaceCredits'
 import Paywall from './Paywall'

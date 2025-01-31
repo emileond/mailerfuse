@@ -1,7 +1,7 @@
 import useCurrentWorkspace from '../../hooks/useCurrentWorkspace'
 import { useWorkspaces } from '../../hooks/react-query/teams/useWorkspaces'
 import { useUser } from '../../hooks/react-query/user/useUser'
-import { Select, SelectItem } from '@nextui-org/react'
+import { Select, SelectItem } from "@heroui/react"
 import { useEffect } from 'react'
 
 function WorkspaceSwitcher() {

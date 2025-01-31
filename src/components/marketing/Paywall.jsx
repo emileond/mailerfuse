@@ -4,7 +4,7 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
-} from '@nextui-org/react'
+} from "@heroui/react"
 import { RiVipCrownFill } from 'react-icons/ri'
 import PricingPlans from './PricingPlans'
 import VolumePricingCard from './VolumePricingCard'

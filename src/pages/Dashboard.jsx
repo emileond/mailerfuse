@@ -25,7 +25,7 @@ import {
   CardHeader,
   CardBody,
   Divider,
-} from '@nextui-org/react'
+} from "@heroui/react"
 import AppLayout from '../components/layout/AppLayout'
 import PageLayout from '../components/layout/PageLayout'
 import DropzoneUpload from '../components/files/DropzoneUpload'

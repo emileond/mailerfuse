@@ -1,7 +1,7 @@
 import { useParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import NavBar from '../components/marketing/Nav'
-import { Image } from '@nextui-org/react'
+import { Image } from "@heroui/react"
 import { mdxComponents } from '../utils/mdxComponents.jsx'
 
 function BlogPost() {

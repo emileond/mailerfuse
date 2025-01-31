@@ -1,4 +1,4 @@
-import { Button, Image } from '@nextui-org/react'
+import { Button, Image } from "@heroui/react"
 
 function Feature({ heading, description, ctaText, imageUrl, reverse = false }) {
   return (
