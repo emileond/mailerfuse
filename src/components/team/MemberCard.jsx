@@ -11,7 +11,7 @@ import {
     Tooltip,
     useDisclosure,
     User,
-} from "@heroui/react";
+} from '@heroui/react';
 import { RiEditLine, RiDeleteBin6Line, RiMailSendLine } from 'react-icons/ri';
 import toast from 'react-hot-toast';
 import {
@@ -100,7 +100,13 @@ function MemberCard({ member, onEditMember }) {
                                 </Tooltip>
                             )}
                             <Tooltip content="Edit">
-                                <Button variant="light" size="md" isIconOnly onPress={handleOnEdit}>
+                                <Button
+                                    variant="light"
+                                    size="md"
+                                    isIconOnly
+                                    onPress={handleOnEdit}
+                                    isDisabled={member.role === 'owner'}
+                                >
                                     <RiEditLine className="text-lg" />
                                 </Button>
                             </Tooltip>
@@ -139,7 +145,7 @@ function MemberCard({ member, onEditMember }) {
                         >
                             Close
                         </Button>
-                        <Button color="danger" isLoading={isDeleting} onClick={handleDelete}>
+                        <Button color="danger" isLoading={isDeleting} onPress={handleDelete}>
                             Yes, remove
                         </Button>
                     </ModalFooter>
