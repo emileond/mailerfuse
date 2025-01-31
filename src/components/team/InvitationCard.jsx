@@ -1,24 +1,19 @@
-import { Button, Card, CardBody, Chip, useDisclosure } from "@heroui/react";
+import { Button, Card, CardBody } from '@heroui/react';
 import toast from 'react-hot-toast';
-import {
-    useDeleteWorkspaceMember,
-    useUpdateWorkspaceMember,
-} from '../../hooks/react-query/teams/useWorkspaceMembers.js';
-import useCurrentWorkspace from '../../hooks/useCurrentWorkspace';
+import { useUser } from '../../hooks/react-query/user/useUser.js';
+import { useUpdateUserInvitation } from '../../hooks/react-query/user/useUserInvitations.js';
 
 function InvitationCard({ invitation }) {
-    const [currentWorkspace] = useCurrentWorkspace();
-    const { mutateAsync: deleteWorkspaceMember, isPending: isDeleting } =
-        useDeleteWorkspaceMember(currentWorkspace);
-    const { mutateAsync: updateWorkspaceMember, isPending: isUpdating } =
-        useUpdateWorkspaceMember(currentWorkspace);
+    const { data: user } = useUser();
+    const { mutateAsync: updateUserInvitation, isPending: isUpdating } =
+        useUpdateUserInvitation(user);
 
-    const handleAccept = async (role, isResendEmail) => {
-        await updateWorkspaceMember(
-            { id: invitation.id, role: isResendEmail ? invitation.role : role },
+    const handleUpdate = async (status) => {
+        await updateUserInvitation(
+            { id: invitation.id, status, user_id: user.id },
             {
                 onSuccess: () => {
-                    toast.success(isResendEmail ? 'Invitation sent' : 'Member updated');
+                    toast.success(`Invitation ${status}`);
                 },
                 onError: (error) => {
                     toast.error(error.message);
@@ -26,20 +21,6 @@ function InvitationCard({ invitation }) {
             },
         );
         // close modal
-    };
-
-    const handleDecline = async () => {
-        await deleteWorkspaceMember(
-            { id: invitation.id },
-            {
-                onSuccess: () => {
-                    toast('Member removed');
-                },
-                onError: (error) => {
-                    toast.error(error.message);
-                },
-            },
-        );
     };
 
     return (
@@ -55,7 +36,7 @@ function InvitationCard({ invitation }) {
                             color="default"
                             variant="solid"
                             size="md"
-                            onPress={() => handleUpdate(invitation.email, true)}
+                            onPress={() => handleUpdate('declined')}
                             isLoading={isUpdating}
                         >
                             Decline
@@ -64,7 +45,7 @@ function InvitationCard({ invitation }) {
                             color="primary"
                             variant="solid"
                             size="md"
-                            onPress={() => handleUpdate(invitation.email, true)}
+                            onPress={() => handleUpdate('active')}
                             isLoading={isUpdating}
                         >
                             Accept

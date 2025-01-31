@@ -23,3 +23,36 @@ export const useUserInvitations = (user) => {
         enabled: !!user, // Only fetch if user is provided
     });
 };
+
+// Function to update invitation
+const updateUserInvitation = async ({ id, status, user_id }) => {
+    const { error } = await supabaseClient
+        .from('workspace_members')
+        .update([
+            {
+                status,
+                user_id,
+                updated_at: new Date(),
+            },
+        ])
+        .eq('id', id);
+
+    if (error) {
+        console.error('Error updating workspace member:', error);
+        throw new Error(error.message);
+    }
+};
+
+// Hook to update invitation
+export const useUpdateUserInvitation = (user) => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: updateUserInvitation,
+        onSuccess: () => {
+            // Invalidate and refetch
+            queryClient.invalidateQueries(['userInvitations', user?.id]);
+            queryClient.invalidateQueries(['workspaces', user?.id]);
+        },
+    });
+};
