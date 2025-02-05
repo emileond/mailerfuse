@@ -42,11 +42,11 @@ export const useWorkspaces = (user) => {
 };
 
 // Update a team's details
-const updateWorkspace = async ({ teamId, name }) => {
+const updateWorkspace = async ({ workspaceId, name }) => {
     const { data, error } = await supabaseClient
         .from('workspaces')
         .update({ name })
-        .eq('id', teamId)
+        .eq('id', workspaceId)
         .select()
         .single();
 
