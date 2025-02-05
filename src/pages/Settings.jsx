@@ -35,6 +35,10 @@ function SettingsPage() {
         }
     };
 
+    const handleGeneralReset = () => {
+        setValue('workspace_name', currentWorkspace.name);
+    };
+
     useEffect(() => {
         if (currentWorkspace?.name) {
             setValue('workspace_name', currentWorkspace.name);
@@ -68,7 +72,13 @@ function SettingsPage() {
                     <Divider />
                     <CardFooter>
                         <div className="w-full flex gap-2 justify-end">
-                            <Button size="sm" variant="ghost" color="default" disabled={isLoading}>
+                            <Button
+                                size="sm"
+                                variant="ghost"
+                                color="default"
+                                isDisabled={isLoading}
+                                onPress={handleGeneralReset}
+                            >
                                 Cancel
                             </Button>
                             <Button
