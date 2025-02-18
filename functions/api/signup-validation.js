@@ -13,8 +13,12 @@ export async function onRequestPost(context) {
 
     const supabase = createClient(context.env.SUPABASE_URL, context.env.SUPABASE_SERVICE_KEY);
 
-    // Process Email Validation (with Supabase)
-    const result = await processEmailValidation(email, supabase);
-
-    return new Response(JSON.stringify(result));
+    try {
+        const validationResult = await processEmailValidation(email, supabase);
+        return new Response(JSON.stringify(validationResult));
+    } catch (err) {
+        return new Response(JSON.stringify({ error: err?.message || 'Validation error' }), {
+            status: 500,
+        });
+    }
 }
