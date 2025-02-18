@@ -78,8 +78,8 @@ export async function processEmailValidation(email, supabase = null) {
             role: validationResult.role,
             did_you_mean: validationResult.did_you_mean,
             disposable: validationResult.disposable,
-            domain_status: supabase ? recordsResult.domain_status : null,
-            mx_record: supabase ? recordsResult.mx_record : null,
+            domain_status: recordsResult?.domain_status ?? null,
+            mx_record: recordsResult?.mx_record ?? null,
         };
     }
 }
