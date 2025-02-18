@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Button, Input, Link } from "@heroui/react";
+import { Button, Input, Link } from '@heroui/react';
 import { Link as RouterLink } from 'react-router-dom';
 import { PiWarningBold } from 'react-icons/pi';
 import { useLoginUser, useRegisterUser } from '../../hooks/react-query/user/useUser';
 import Logo from '../Logo';
+import ky from 'ky';
 
 function AuthForm({ viewMode = 'signup' }) {
     const { mutateAsync: registerUser } = useRegisterUser();
@@ -49,12 +50,18 @@ function AuthForm({ viewMode = 'signup' }) {
 
         // Await the email validation before proceeding
 
-        const isValidEmail = await validateEmail(email);
+        const res = await ky
+            .post('/api/signup-validation', {
+                json: {
+                    email,
+                },
+            })
+            .json();
+
+        const isValidEmail = res.status === 'deliverable';
 
         if (!isValidEmail) {
-            setError(
-                'Disposable email addresses are not allowed, please use a valid email address',
-            );
+            setError('Invalid email, please use a valid email address');
             setIsLoading(false);
             return;
         }
