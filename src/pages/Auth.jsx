@@ -12,10 +12,8 @@ function AuthPage({ authMode = 'login' }) {
     useEffect(() => {
         if (user && workspaces) {
             if (workspaces.length > 0) {
-                console.log(workspaces);
                 navigate('/dashboard');
             } else {
-                console.log('no workspaces', workspaces, user);
                 navigate('/onboarding');
             }
         }
