@@ -48,25 +48,23 @@ function AuthForm({ viewMode = 'signup' }) {
         setIsLoading(true);
         const { email, password } = data;
 
-        // Await the email validation before proceeding
-
-        const res = await ky
-            .post('/api/signup-validation', {
-                json: {
-                    email,
-                },
-            })
-            .json();
-
-        const isValidEmail = res.status === 'deliverable';
-
-        if (!isValidEmail) {
-            setError('Invalid email, please use a valid email address');
-            setIsLoading(false);
-            return;
-        }
-
         if (view === 'signup') {
+            // Await the email validation before proceeding
+            const res = await ky
+                .post('/api/signup-validation', {
+                    json: {
+                        email,
+                    },
+                })
+                .json();
+
+            const isValidEmail = res.status === 'deliverable';
+
+            if (!isValidEmail) {
+                setError('Invalid email, please use a valid email address');
+                setIsLoading(false);
+                return;
+            }
             try {
                 await registerUser({ email, password });
                 setView('signup-success');
