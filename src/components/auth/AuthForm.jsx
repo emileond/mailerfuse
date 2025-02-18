@@ -5,8 +5,6 @@ import { Link as RouterLink } from 'react-router-dom';
 import { PiWarningBold } from 'react-icons/pi';
 import { useLoginUser, useRegisterUser } from '../../hooks/react-query/user/useUser';
 import Logo from '../Logo';
-import { supabaseClient } from '../../lib/supabase.js';
-import { processEmailValidation } from '../../utils/processEmail.js';
 import ky from 'ky';
 
 function AuthForm({ viewMode = 'signup' }) {
