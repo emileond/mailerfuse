@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
-import crypto from 'node:crypto';
-import { Buffer } from 'node:buffer';
+import crypto from 'crypto';
+import { Buffer } from 'buffer';
 
 export async function onRequestPost(context) {
     const signingSecret = context.env.LEMONSQUEEZY_SIGNING_SECRET;
