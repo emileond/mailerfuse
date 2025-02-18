@@ -5,13 +5,14 @@ import useCurrentWorkspace from '../../hooks/useCurrentWorkspace.js';
 
 function VolumePricingCard() {
     const [currentWorkspace] = useCurrentWorkspace();
-    const URL = `https://snapseditor.lemonsqueezy.com/buy/7e570118-9456-4aaa-91c3-b8fa53f33db5?quantity=10000&checkout[custom][workspace_id]=${currentWorkspace.workspace_id}`;
     const COST_PER_CREDIT = 0.002;
 
     const [price, setPrice] = useState(6);
-    const [credits, setCredits] = useState(3000);
+    const [credits, setCredits] = useState(5000);
 
     const features = ['All features included', 'No monthly payments', 'Credits never expire'];
+
+    const URL = `https://snapseditor.lemonsqueezy.com/buy/1150162c-1878-4ef6-bb31-6d418e6b8553?quantity=${credits}&checkout[custom][workspace_id]=${currentWorkspace?.workspace_id}`;
 
     const handleChange = (val) => {
         switch (val) {
@@ -20,38 +21,34 @@ function VolumePricingCard() {
                 setCredits(0);
                 break;
             case 2:
-                setPrice(3000 * COST_PER_CREDIT);
-                setCredits(3000);
-                break;
-            case 3:
                 setPrice(5000 * COST_PER_CREDIT);
                 setCredits(5000);
                 break;
-            case 4:
+            case 3:
                 setPrice(10000 * COST_PER_CREDIT);
                 setCredits(10000);
                 break;
-            case 5:
+            case 4:
                 setPrice(25000 * COST_PER_CREDIT);
                 setCredits(25000);
                 break;
-            case 6:
+            case 5:
                 setPrice(50000 * COST_PER_CREDIT);
                 setCredits(50000);
                 break;
-            case 7:
+            case 6:
                 setPrice(100000 * COST_PER_CREDIT);
                 setCredits(100000);
                 break;
-            case 8:
+            case 7:
                 setPrice(250000 * COST_PER_CREDIT);
                 setCredits(250000);
                 break;
-            case 9:
+            case 8:
                 setPrice(500000 * COST_PER_CREDIT);
                 setCredits(500000);
                 break;
-            case 10:
+            case 9:
                 setPrice(1000000 * COST_PER_CREDIT);
                 setCredits(1000000);
                 break;
@@ -67,9 +64,10 @@ function VolumePricingCard() {
                 How many emails do you need to validate?
             </h3>
             <Slider
+                aria-label="credits picker"
                 step={1}
                 formatOptions={{ style: 'percent' }}
-                maxValue={10}
+                maxValue={9}
                 minValue={0}
                 marks={[
                     {
@@ -78,38 +76,34 @@ function VolumePricingCard() {
                     },
                     {
                         value: 2,
-                        label: '3,000',
-                    },
-                    {
-                        value: 3,
                         label: '5,000',
                     },
                     {
-                        value: 4,
+                        value: 3,
                         label: '10,000',
                     },
                     {
-                        value: 5,
+                        value: 4,
                         label: '25,000',
                     },
                     {
-                        value: 6,
+                        value: 5,
                         label: '50,000',
                     },
                     {
-                        value: 7,
+                        value: 6,
                         label: '100,000',
                     },
                     {
-                        value: 8,
+                        value: 7,
                         label: '250,000',
                     },
                     {
-                        value: 9,
+                        value: 8,
                         label: '500,000',
                     },
                     {
-                        value: 10,
+                        value: 9,
                         label: '1,000,000',
                     },
                 ]}
@@ -153,6 +147,7 @@ function VolumePricingCard() {
                             className="w-full lemonsqueezy-button"
                             color="primary"
                             href={URL}
+                            isDisabled={!price}
                         >
                             Get started
                         </Button>

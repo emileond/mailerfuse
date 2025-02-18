@@ -23,9 +23,6 @@ export async function onRequestPost(context) {
     const computedSignatureBuffer = Buffer.from(computedSignature, 'hex');
     const receivedSignatureBuffer = Buffer.from(receivedSignature, 'hex');
 
-    console.log('Computed Signature:', computedSignature);
-    console.log('Received Signature:', receivedSignature);
-
     // Ensure Buffers are of the same length before comparison
     if (
         computedSignatureBuffer.length !== receivedSignatureBuffer.length ||
@@ -44,17 +41,19 @@ export async function onRequestPost(context) {
     const { workspace_id } = meta.custom_data;
 
     // basic check
-    console.log(status, refunded, product_id, quantity, workspace_id);
-
     if (!status || !product_id || !quantity || !workspace_id) {
         return new Response(JSON.stringify({ error: 'Missing parameters' }), {
             status: 400,
         });
     }
 
-    // if not mailerfuse's product id
+    // order and product check
     if (product_id !== Number(context.env.LEMONSQUEEZY_PRODUCT_ID)) {
         return new Response(null, { status: 204 }); // No content to process
+    }
+
+    if (status !== 'paid' && refunded !== false) {
+        return new Response(null, { status: 204 }); // No action needed
     }
 
     const supabase = createClient(context.env.SUPABASE_URL, context.env.SUPABASE_SERVICE_KEY);
