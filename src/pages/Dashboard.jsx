@@ -90,6 +90,9 @@ function DashboardPage() {
             console.error(error);
         } finally {
             setIsSingleLoading(false);
+            await queryClient.invalidateQueries({
+                queryKey: ['workspaceCredits', currentWorkspace?.workspace_id],
+            });
         }
     };
 
@@ -164,10 +167,13 @@ function DashboardPage() {
                         }
                     } finally {
                         setIsFileUploading(false);
+                        await queryClient.invalidateQueries({
+                            queryKey: ['emailLists', currentWorkspace?.workspace_id],
+                        });
+                        await queryClient.invalidateQueries({
+                            queryKey: ['workspaceCredits', currentWorkspace?.workspace_id],
+                        });
                     }
-                    await queryClient.invalidateQueries({
-                        queryKey: ['emailLists', currentWorkspace?.workspace_id],
-                    });
                 } else {
                     toast('No email column found', {
                         type: 'error',
