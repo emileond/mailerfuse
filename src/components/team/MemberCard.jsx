@@ -71,7 +71,7 @@ function MemberCard({ member, onEditMember }) {
                             name={member.name || member.email.split('@')[0]}
                             description={member.email}
                             avatarProps={{
-                                src: member.avatar,
+                                src: member?.avatar,
                             }}
                         />
                         <span className="text-default-500">{member.role}</span>
