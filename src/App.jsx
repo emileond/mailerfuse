@@ -6,7 +6,7 @@ import LandingPage from './pages/Landing.jsx';
 import AuthPage from './pages/Auth.jsx';
 import NotFoundPage from './pages/404.jsx';
 import { Toaster } from 'react-hot-toast';
-import { Progress } from "@heroui/react";
+import { Progress } from '@heroui/react';
 import { useUser } from './hooks/react-query/user/useUser.js';
 import ListDetailsPage from './pages/ListDetailsPage.jsx';
 import OnboardingPage from './pages/Onboarding.jsx';
@@ -20,6 +20,7 @@ import TeamPage from './pages/Team.jsx';
 import IntegrationsPage from './pages/Integrations.jsx';
 import SettingsPage from './pages/Settings.jsx';
 import ProfilePage from './pages/Profile.jsx';
+import AppsumoPage from './pages/Appsumo.jsx';
 
 function App() {
     const { isLoading } = useUser();
@@ -113,6 +114,10 @@ function App() {
                     <SettingsPage />
                 </ProtectedRoute>
             ),
+        },
+        {
+            path: '/appsumo',
+            element: <AppsumoPage />,
         },
         {
             path: '*',
