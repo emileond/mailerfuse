@@ -47,18 +47,22 @@ function UserMenu({ avatarOnly }) {
 
     useEffect(() => {
         if (isReady && user && !chatOpened) {
-            const addUserProfile = new CustomEvent('charla:updateVisitorAttributes', {
-                detail: {
-                    email: user.email,
-                    user_id: user.id,
-                },
-            });
-            document.dispatchEvent(addUserProfile);
+            try {
+                const addUserProfile = new CustomEvent('charla:updateVisitorAttributes', {
+                    detail: {
+                        email: user.email,
+                        user_id: user.id,
+                    },
+                });
+                document.dispatchEvent(addUserProfile);
 
-            const charlaOpenWidgetEvent = new Event('charla:openWidget');
-            document.dispatchEvent(charlaOpenWidgetEvent);
+                const charlaOpenWidgetEvent = new Event('charla:openWidget');
+                document.dispatchEvent(charlaOpenWidgetEvent);
 
-            setChatOpened(true);
+                setChatOpened(true);
+            } catch (error) {
+                console.error('Failed to initialize chat widget:', error);
+            }
         }
     }, [isReady, user, chatOpened]);
 
