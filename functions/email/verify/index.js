@@ -32,7 +32,9 @@ export async function onRequestPost(context) {
         .single();
 
     if (error || !data) {
-        return new Response(JSON.stringify({ error: 'Invalid API key' }));
+        return new Response(JSON.stringify({ error: 'Invalid API key' }), {
+            status: 401,
+        });
     }
 
     // 1. check credits

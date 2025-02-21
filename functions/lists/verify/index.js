@@ -7,7 +7,6 @@ async function validateApiKey(apiKey, context, supabase) {
             isValid: false,
             response: new Response(JSON.stringify({ error: 'API key is missing' }), {
                 status: 401,
-                headers: { 'Content-Type': 'application/json' },
             }),
         };
     }
@@ -24,7 +23,6 @@ async function validateApiKey(apiKey, context, supabase) {
             isValid: false,
             response: new Response(JSON.stringify({ error: 'Invalid API key' }), {
                 status: 401,
-                headers: { 'Content-Type': 'application/json' },
             }),
         };
     }
