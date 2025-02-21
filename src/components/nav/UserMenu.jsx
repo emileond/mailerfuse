@@ -24,7 +24,7 @@ import { useLogout } from '../../hooks/react-query/user/useUser';
 import { Link } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { useUserProfile } from '../../hooks/react-query/user/useUserProfile.js';
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 function UserMenu({ avatarOnly }) {
     const queryClient = useQueryClient();
@@ -32,20 +32,51 @@ function UserMenu({ avatarOnly }) {
     const { data: user } = useUser();
     const { data: userProfile, isPending: isUserProfilePending } = useUserProfile(user);
     const { mutateAsync: logoutUser } = useLogout();
+    const [isReady, setIsReady] = useState(false);
+    const [chatOpened, setChatOpened] = useState(false);
 
     const USER_ICON_SIZE = 20;
     const ICON_SIZE = 22;
 
-    // Memoized logout function
     const handleLogout = useCallback(async () => {
         await logoutUser();
-        await queryClient.invalidateQueries(); // No need to cancel queries before invalidating
+        await queryClient.invalidateQueries();
     }, [logoutUser, queryClient]);
 
-    // Fallback avatar URL
     const avatarUrl = userProfile?.avatar;
 
-    if (!user || isUserProfilePending) return null; // Prevents unnecessary rendering
+    useEffect(() => {
+        if (isReady && user && !chatOpened) {
+            const addUserProfile = new CustomEvent('charla:updateVisitorAttributes', {
+                detail: {
+                    email: user.email,
+                    user_id: user.id,
+                },
+            });
+            document.dispatchEvent(addUserProfile);
+
+            const charlaOpenWidgetEvent = new Event('charla:openWidget');
+            document.dispatchEvent(charlaOpenWidgetEvent);
+
+            setChatOpened(true);
+        }
+    }, [isReady, user, chatOpened]);
+
+    const handleHelpClick = () => {
+        let widgetElement = document.createElement('charla-widget');
+        widgetElement.setAttribute('p', '7fb0b19a-18a6-41e2-8209-a022a6d4c4d9');
+        document.body.appendChild(widgetElement);
+
+        let widgetCode = document.createElement('script');
+        widgetCode.src = 'https://app.getcharla.com/widget/widget.js';
+        document.body.appendChild(widgetCode);
+
+        document.addEventListener('charla:widgetLoaded', () => {
+            setIsReady(true);
+        });
+    };
+
+    if (!user || isUserProfilePending) return null;
 
     return (
         <Dropdown>
@@ -88,10 +119,17 @@ function UserMenu({ avatarOnly }) {
                     </DropdownItem>
                 </DropdownSection>
                 <DropdownSection showDivider>
-                    <DropdownItem startContent={<RiMegaphoneLine fontSize={USER_ICON_SIZE} />}>
+                    <DropdownItem
+                        // className="taku-launcher"
+                        onPress={() => window.Taku('news:show')}
+                        startContent={<RiMegaphoneLine fontSize={USER_ICON_SIZE} />}
+                    >
                         {`What's new`}
                     </DropdownItem>
-                    <DropdownItem startContent={<RiQuestionLine fontSize={USER_ICON_SIZE} />}>
+                    <DropdownItem
+                        startContent={<RiQuestionLine fontSize={USER_ICON_SIZE} />}
+                        onPress={handleHelpClick}
+                    >
                         Help
                     </DropdownItem>
                 </DropdownSection>
@@ -126,12 +164,13 @@ function UserMenu({ avatarOnly }) {
                         },
                     ].map((route, index) => (
                         <DropdownItem
-                            as={route.path ? Link : 'button'}
+                            as={route.path && Link}
                             key={index}
                             to={route.path}
                             onPress={route.action}
                             startContent={route?.startContent}
-                            className="items-center justify-start"
+                            className={`items-center justify-start ${route.name === 'Log Out' && 'text-danger'}`}
+                            color={route.name === 'Log Out' ? 'danger' : 'default'}
                         >
                             {route.name}
                         </DropdownItem>

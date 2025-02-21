@@ -21,6 +21,7 @@ import IntegrationsPage from './pages/Integrations.jsx';
 import SettingsPage from './pages/Settings.jsx';
 import ProfilePage from './pages/Profile.jsx';
 import AppsumoPage from './pages/Appsumo.jsx';
+import TakuWidget from './components/marketing/TakuWidget.js';
 
 function App() {
     const { isLoading } = useUser();
