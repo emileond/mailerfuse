@@ -2,17 +2,22 @@ import { useEffect } from 'react';
 
 const TakuWidget = () => {
     useEffect(() => {
+        let scriptElement = null;
         if (!document.getElementById('taku-js')) {
-            const script = document.createElement('script');
-            script.id = 'taku-js';
-            script.src = 'https://cdn.taku-app.com/js/latest.js';
-            script.async = true;
-            document.body.appendChild(script);
-
-            script.onload = () => {
+            scriptElement = document.createElement('script');
+            scriptElement.id = 'taku-js';
+            scriptElement.src = 'https://cdn.taku-app.com/js/latest.js';
+            scriptElement.async = true;
+            
+            const handleError = () => {
+                console.error('Failed to load Taku widget script');
+            };
+            
+            scriptElement.addEventListener('error', handleError);
+            scriptElement.onload = () => {
                 if (window.Taku) {
                     window.Taku('news:boot', {
-                        api_public_key: '793006e41483478031c58f9c6440e525',
+                        api_public_key: process.env.REACT_APP_TAKU_API_KEY,
                         position: 'right',
                         custom_launcher: '.taku-launcher',
                         custom_launcher_options: {
@@ -21,7 +26,14 @@ const TakuWidget = () => {
                     });
                 }
             };
+            
+            document.body.appendChild(scriptElement);
         }
+        return () => {
+            if (scriptElement) {
+                scriptElement.remove();
+            }
+        };
     }, []);
 
     return null; // No UI, just loading the script
