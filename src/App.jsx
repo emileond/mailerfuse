@@ -22,6 +22,9 @@ import SettingsPage from './pages/Settings.jsx';
 import ProfilePage from './pages/Profile.jsx';
 import AppsumoPage from './pages/Appsumo.jsx';
 import TakuWidget from './components/marketing/TakuWidget.js';
+import PrivacyPolicyPage from './pages/PrivacyPolicy.jsx';
+import TOSPage from './pages/TOS.jsx';
+import AUPolicyPage from './pages/AUPolicyPage.jsx';
 
 function App() {
     const { isLoading } = useUser();
@@ -119,6 +122,18 @@ function App() {
         {
             path: '/appsumo',
             element: <AppsumoPage />,
+        },
+        {
+            path: '/privacy-policy',
+            element: <PrivacyPolicyPage />,
+        },
+        {
+            path: '/tos',
+            element: <TOSPage />,
+        },
+        {
+            path: '/acceptable-use-policy',
+            element: <AUPolicyPage />,
         },
         {
             path: '*',
