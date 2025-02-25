@@ -10,7 +10,7 @@ const fetchWorkspaces = async (user) => {
       workspace_id,
       role,
       workspaces!workspace_members_workspace_id_fkey (
-        name
+        name, is_ltd, ltd_plan
       )
     `,
         )
@@ -25,7 +25,9 @@ const fetchWorkspaces = async (user) => {
     const transformedData = data.map((item) => ({
         workspace_id: item.workspace_id,
         role: item.role,
-        name: item.workspaces?.name, // Flatten the 'name' field
+        name: item.workspaces?.name,
+        is_ltd: item.workspaces?.is_ltd,
+        ltd_plan: item.workspaces?.ltd_plan,
     }));
 
     return transformedData;

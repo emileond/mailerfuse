@@ -18,7 +18,7 @@ function VolumePricingCard() {
         switch (val) {
             case 1:
                 setPrice(0);
-                setCredits(0);
+                setCredits(1000);
                 break;
             case 2:
                 setPrice(5000 * COST_PER_CREDIT);
@@ -72,7 +72,7 @@ function VolumePricingCard() {
                 marks={[
                     {
                         value: 1,
-                        label: '250',
+                        label: '1,000',
                     },
                     {
                         value: 2,
@@ -149,7 +149,7 @@ function VolumePricingCard() {
                             href={URL}
                             isDisabled={!price}
                         >
-                            Get started
+                            Get credits
                         </Button>
                     </CardFooter>
                 </Card>
