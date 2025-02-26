@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { validateEmail } from '../utils/validateEmail';
 import { verifyRecords } from '../utils/verifyRecords';
 import { cacheDate } from '../utils/cacheDate';
+import ky from 'ky';
 
 // Initialize Supabase client
 const supabase = createClient(
@@ -12,6 +13,12 @@ const supabase = createClient(
 
 export const emailVerificationTask = task({
     id: 'bulk-email-verification',
+    machine: 'small-2x',
+    retry: {
+        outOfMemory: {
+            machine: 'large-1x',
+        },
+    },
     onFailure: async (payload: {
         data: any;
         emailColumn: string;
@@ -25,6 +32,50 @@ export const emailVerificationTask = task({
                 status: 'error',
             })
             .eq('id', listId);
+    },
+    onSuccess: async (
+        payload,
+        output: {
+            deliverable: number;
+            undeliverable: number;
+            risky: number;
+            unknown: number;
+        },
+        { ctx },
+    ) => {
+        const { listId } = payload;
+
+        // Fetch user email
+        const { data: listData } = await supabase
+            .from('lists')
+            .select('user_email')
+            .eq('id', listId)
+            .single();
+
+        if (listData?.user_email) {
+            const emailResponse = await ky.post('https://listmonk.mailerfuse.com/api/tx', {
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    Authorization: `token ${process.env.LISTMONK_USERNAME}:${process.env.LISTMONK_ACCESS_TOKEN}`,
+                },
+                json: {
+                    subscriber_email: listData.user_email,
+                    template_id: 5,
+                    data: {
+                        deliverable: output.deliverable,
+                        risky: output.risky,
+                        undeliverable: output.undeliverable,
+                        unknown: output.unknown,
+                    },
+                    content_type: 'html',
+                },
+            });
+
+            if (!emailResponse.ok) {
+                logger.error(`Error sending email notification: ${await emailResponse.text()}`);
+            }
+        }
     },
     run: async (
         payload: {
