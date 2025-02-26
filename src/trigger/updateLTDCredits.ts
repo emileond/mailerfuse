@@ -1,5 +1,6 @@
 import { logger, schedules } from '@trigger.dev/sdk/v3';
 import { createClient } from '@supabase/supabase-js';
+import dayjs from 'dayjs';
 
 // Initialize Supabase client
 const supabase = createClient(
@@ -9,11 +10,10 @@ const supabase = createClient(
 
 export const updateLTDWorkspaces = schedules.task({
     id: 'update-ltd-credits',
-    cron: '0 0 1 * *', // Runs at midnight on the 1st day of each month
+    cron: '0 */8 * * *',
     run: async () => {
         // Define the threshold for outdated records (e.g., at least 30 days old)
-        const lastMonth = new Date();
-        lastMonth.setMonth(lastMonth.getMonth() - 1);
+        const aMonthAgo = dayjs().subtract(1, 'month');
 
         // **Step 1: Fetch workspaces where is_ltd = true**
         const { data: workspaces, error: workspaceError } = await supabase
@@ -38,7 +38,7 @@ export const updateLTDWorkspaces = schedules.task({
             .from('workspace_credits')
             .select('workspace_id, updated_at')
             .in('workspace_id', workspaceIds)
-            .lte('updated_at', lastMonth.toISOString()); // Fetch only outdated records
+            .lte('updated_at', aMonthAgo.toISOString());
 
         if (creditsError) {
             logger.error(`Error fetching workspace_credits: ${creditsError.message}`);
