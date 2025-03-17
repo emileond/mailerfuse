@@ -1,4 +1,6 @@
-import { useLocation } from 'react-router-dom'; // Import the useLocation hook
+import { useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import ky from 'ky';
 import NavBar from '../components/marketing/Nav.jsx';
 import Footer from '../components/marketing/Footer.jsx';
 import { useUser } from '../hooks/react-query/user/useUser.js';
@@ -6,10 +8,45 @@ import AuthForm from '../components/auth/AuthForm.jsx';
 import { Alert, Button, Card, CardBody, CardFooter, CardHeader, Link } from '@heroui/react';
 
 function AppsumoPage() {
-    const { data: user } = useUser(); // User info from the hook
+    const { data: user } = useUser();
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
-    const code = queryParams.get('code'); // Get the code from the URL query params
+    const code = queryParams.get('code');
+    const [license, setLicense] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+
+    async function fetchLicense() {
+        if (!code) return;
+
+        setLoading(true);
+        setError(null);
+
+        try {
+            const response = await ky
+                .post('/api/appsumo/get-user-license', {
+                    json: { code },
+                    throwHttpErrors: false, // Prevent ky from throwing on non-2xx responses
+                })
+                .json();
+
+            console.log('Response:', response);
+
+            if (response.license) {
+                setLicense(response.license);
+            } else {
+                setError(
+                    response.error_description || response.error || 'Failed to retrieve license',
+                );
+                console.error('License fetch error:', response);
+            }
+        } catch (err) {
+            console.error('Request failed:', err);
+            setError(err.message || 'An error occurred while fetching the license.');
+        } finally {
+            setLoading(false);
+        }
+    }
 
     return (
         <div className="w-screen">
@@ -28,7 +65,6 @@ function AppsumoPage() {
                                     description="To redeem your LTD plan, please log in with your existing account, or create one if you don't have one yet."
                                 />
                                 <AuthForm hideHeader viewMode="login" />
-
                                 <p className="mt-4 text-center">
                                     Don’t have an account?{' '}
                                     <Link
@@ -42,16 +78,32 @@ function AppsumoPage() {
                                 </p>
                             </div>
                         ) : (
-                            // If the user is logged in
                             <div className="flex flex-col gap-6 items-center max-w-2xl">
-                                <Alert
-                                    color="primary"
-                                    title={`You're about to activate the LTD plan on: ${user?.email}`}
-                                    description={`If this is not the account you want to use, please log out to use a different account.`}
-                                />
+                                {!error && (
+                                    <Alert
+                                        color="primary"
+                                        title={`You're about to activate the LTD plan on: ${user?.email}`}
+                                        description={`If this is not the account you want to use, please log out to use a different account.`}
+                                    />
+                                )}
+                                {error && (
+                                    <Alert color="danger" title="Error" description={error} />
+                                )}
+                                {license && (
+                                    <Alert
+                                        color="success"
+                                        title="LTD Plan Activated!"
+                                        description={`Your license key: ${license.license_key}`}
+                                    />
+                                )}
                                 <CardFooter>
                                     <div className="w-full flex flex-col items-center gap-3">
-                                        <Button color="secondary" size="lg">
+                                        <Button
+                                            color="secondary"
+                                            size="lg"
+                                            isLoading={loading}
+                                            onPress={fetchLicense}
+                                        >
                                             Confirm and Activate LTD Plan
                                         </Button>
                                         <span className="text-gray-500">OR</span>
