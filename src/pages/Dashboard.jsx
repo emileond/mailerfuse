@@ -473,10 +473,14 @@ function DashboardPage() {
                                         >
                                             <Input
                                                 size="lg"
+                                                type="email"
                                                 isClearable
                                                 placeholder="Enter an email address"
-                                                {...register('email', { required: true })}
+                                                {...register('email', {
+                                                    required: 'Email is required',
+                                                })}
                                             />
+
                                             <Button
                                                 type="submit"
                                                 size="lg"

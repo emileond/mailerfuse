@@ -14,7 +14,6 @@ import { useState } from 'react';
 import CurrentWorkspaceContext from './context/currentWorkspace.js';
 import BlogPage from './pages/Blog.jsx';
 import BlogPost from './pages/BlogPost.jsx';
-import ApiDocsPage from './pages/ApiDocs.jsx';
 import ApiPage from './pages/ApiKeys.jsx';
 import TeamPage from './pages/Team.jsx';
 import IntegrationsPage from './pages/Integrations.jsx';
@@ -34,10 +33,6 @@ function App() {
         {
             path: '/',
             element: <LandingPage />,
-        },
-        {
-            path: '/docs',
-            element: <ApiDocsPage />,
         },
         {
             path: '/blog',
