@@ -6,16 +6,7 @@ export async function onRequestPost(context) {
 
     try {
         const body = await context.request.json();
-        const {
-            license_key,
-            prev_license_key,
-            event,
-            event_timestamp,
-            license_status,
-            tier,
-            test,
-            extra,
-        } = body;
+        const { license_key, prev_license_key, event, license_status, tier, test, extra } = body;
 
         // Validate input
         if (!license_key || !event) {
@@ -27,6 +18,8 @@ export async function onRequestPost(context) {
             );
         }
 
+        const eventTimestamp = new Date().toISOString();
+
         // Define event handlers in an object
         const eventHandlers = {
             purchase: () =>
@@ -35,7 +28,7 @@ export async function onRequestPost(context) {
                         license_status,
                         license_key,
                         event,
-                        event_timestamp,
+                        event_timestamp: eventTimestamp,
                         extra,
                     },
                 ]),
@@ -45,7 +38,7 @@ export async function onRequestPost(context) {
                     .update({
                         license_status: 'active',
                         event,
-                        event_timestamp,
+                        event_timestamp: eventTimestamp,
                         extra,
                     })
                     .eq('license_key', license_key)
@@ -56,7 +49,7 @@ export async function onRequestPost(context) {
                     .update({
                         license_status: 'deactivated',
                         event,
-                        event_timestamp,
+                        event_timestamp: eventTimestamp,
                         extra,
                     })
                     .eq('license_key', license_key)
@@ -68,7 +61,7 @@ export async function onRequestPost(context) {
                         tier,
                         prev_license_key,
                         event,
-                        event_timestamp,
+                        event_timestamp: eventTimestamp,
                         extra,
                     })
                     .eq('license_key', license_key)
@@ -80,7 +73,7 @@ export async function onRequestPost(context) {
                         tier,
                         prev_license_key,
                         event,
-                        event_timestamp,
+                        event_timestamp: eventTimestamp,
                     })
                     .eq('license_key', license_key)
                     .select(),
@@ -97,6 +90,7 @@ export async function onRequestPost(context) {
 
         // Handle Supabase errors
         if (error) {
+            console.log(error);
             return Response.json({ error: error.message }, { status: 500 });
         }
 
