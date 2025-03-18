@@ -8,6 +8,7 @@ import { useWorkspaces } from '../hooks/react-query/teams/useWorkspaces.js';
 import AuthForm from '../components/auth/AuthForm.jsx';
 import { Alert, Button, Card, CardBody, CardFooter, CardHeader, Link } from '@heroui/react';
 import { useQueryClient } from '@tanstack/react-query';
+import toast from 'react-hot-toast';
 
 function AppsumoPage() {
     const { data: user } = useUser();
@@ -48,8 +49,8 @@ function AppsumoPage() {
 
             if (response.license_key) {
                 setLicense(response.license_key);
-                // Redirect to /dashboard when the license is activated
-                navigate('/dashboard'); // <-- Redirect here
+                toast.success('Congratulations! Your AppSumo LTD Plan is now active');
+                navigate('/dashboard');
             } else {
                 setError(
                     response.error_description || response.error || 'Failed to retrieve license',
@@ -104,13 +105,6 @@ function AppsumoPage() {
                                 )}
                                 {error && (
                                     <Alert color="danger" title="Error" description={error} />
-                                )}
-                                {license && (
-                                    <Alert
-                                        color="success"
-                                        title="AppSumo Plan Activated!"
-                                        description="Congratulations! Your AppSumo Lifetime Deal plan is now active and ready to use."
-                                    />
                                 )}
                                 <CardFooter>
                                     {!license && (

@@ -29,7 +29,13 @@ import {
 import AppLayout from '../components/layout/AppLayout';
 import PageLayout from '../components/layout/PageLayout';
 import DropzoneUpload from '../components/files/DropzoneUpload';
-import { RiAddLine, RiMore2Fill, RiDeleteBin6Line } from 'react-icons/ri';
+import {
+    RiAddLine,
+    RiMore2Fill,
+    RiDeleteBin6Line,
+    RiCheckboxCircleFill,
+    RiErrorWarningFill,
+} from 'react-icons/ri';
 import { PiFileCsvDuotone } from 'react-icons/pi';
 import useCurrentWorkspace from '../hooks/useCurrentWorkspace';
 import Papa from 'papaparse';
@@ -486,7 +492,15 @@ function DashboardPage() {
                                             <h5 className="text-sm font-medium text-default-500 mb-3">
                                                 Result
                                             </h5>
-                                            <Card shadow="sm">
+                                            <Card
+                                                shadow="sm"
+                                                className={`border 
+        ${singleVerification?.status === 'deliverable' ? 'border-success bg-gradient-to-b from-content1 to-success-50/10' : ''}
+        ${singleVerification?.status === 'risky' ? 'border-warning bg-gradient-to-b from-content1 to-warning-50/10' : ''}
+        ${singleVerification?.status === 'undeliverable' ? 'border-danger bg-gradient-to-b from-content1 to-danger-50/10' : ''}
+        ${singleVerification?.status === 'unknown' ? 'border-default' : ''}
+    `}
+                                            >
                                                 <CardHeader>
                                                     <div className="w-full flex justify-between px-6">
                                                         <span className="font-medium">
@@ -518,7 +532,7 @@ function DashboardPage() {
                                                 <CardBody className="p-6">
                                                     <div className="flex gap-6 text-sm font-medium mx-auto">
                                                         <div className="flex flex-col items-end gap-3 text-default-500">
-                                                            <span>Syntax error:</span>
+                                                            <span>Syntax error: </span>
                                                             <span>Disposable:</span>
                                                             <span>Gibberish:</span>
                                                             <span>Did you mean:</span>
@@ -528,19 +542,61 @@ function DashboardPage() {
                                                         </div>
                                                         <div className="flex flex-col gap-3">
                                                             <span>
-                                                                {singleVerification?.syntax_error
-                                                                    ? 'Yes'
-                                                                    : 'No'}
+                                                                {singleVerification?.syntax_error ? (
+                                                                    <div className="flex gap-1">
+                                                                        <RiErrorWarningFill
+                                                                            fontSize="1.2rem"
+                                                                            className="inline-block text-danger"
+                                                                        />
+                                                                        Yes
+                                                                    </div>
+                                                                ) : (
+                                                                    <div className="flex gap-1">
+                                                                        <RiCheckboxCircleFill
+                                                                            fontSize="1.2rem"
+                                                                            className="inline-block text-success"
+                                                                        />
+                                                                        No
+                                                                    </div>
+                                                                )}
                                                             </span>
                                                             <span>
-                                                                {singleVerification?.disposable
-                                                                    ? 'Yes'
-                                                                    : 'No'}
+                                                                {singleVerification?.disposable ? (
+                                                                    <div className="flex gap-1">
+                                                                        <RiErrorWarningFill
+                                                                            fontSize="1.2rem"
+                                                                            className="inline-block text-danger"
+                                                                        />
+                                                                        Yes
+                                                                    </div>
+                                                                ) : (
+                                                                    <div className="flex gap-1">
+                                                                        <RiCheckboxCircleFill
+                                                                            fontSize="1.2rem"
+                                                                            className="inline-block text-success"
+                                                                        />
+                                                                        No
+                                                                    </div>
+                                                                )}
                                                             </span>
                                                             <span>
-                                                                {singleVerification?.gibberish
-                                                                    ? 'Yes'
-                                                                    : 'No'}
+                                                                {singleVerification?.gibberish ? (
+                                                                    <div className="flex gap-1">
+                                                                        <RiErrorWarningFill
+                                                                            fontSize="1.2rem"
+                                                                            className="inline-block text-danger"
+                                                                        />
+                                                                        Yes
+                                                                    </div>
+                                                                ) : (
+                                                                    <div className="flex gap-1">
+                                                                        <RiCheckboxCircleFill
+                                                                            fontSize="1.2rem"
+                                                                            className="inline-block text-success"
+                                                                        />
+                                                                        No
+                                                                    </div>
+                                                                )}
                                                             </span>
                                                             <span>
                                                                 {singleVerification?.did_you_mean
@@ -548,19 +604,65 @@ function DashboardPage() {
                                                                     : '-'}
                                                             </span>
                                                             <span>
-                                                                {singleVerification?.role
-                                                                    ? 'Yes'
-                                                                    : 'No'}
+                                                                {singleVerification?.role ? (
+                                                                    <div className="flex gap-1">
+                                                                        <RiErrorWarningFill
+                                                                            fontSize="1.2rem"
+                                                                            className="inline-block text-danger"
+                                                                        />
+                                                                        Yes
+                                                                    </div>
+                                                                ) : (
+                                                                    <div className="flex gap-1">
+                                                                        <RiCheckboxCircleFill
+                                                                            fontSize="1.2rem"
+                                                                            className="inline-block text-success"
+                                                                        />
+                                                                        No
+                                                                    </div>
+                                                                )}
                                                             </span>
                                                             <span>
-                                                                {singleVerification?.domain_status
-                                                                    ? singleVerification?.domain_status
-                                                                    : '-'}
+                                                                {singleVerification?.domain_status ===
+                                                                'active' ? (
+                                                                    <div className="flex gap-1">
+                                                                        <RiCheckboxCircleFill
+                                                                            fontSize="1.2rem"
+                                                                            className="inline-block text-success"
+                                                                        />
+                                                                        Active
+                                                                    </div>
+                                                                ) : (
+                                                                    <div className="flex gap-1">
+                                                                        <RiErrorWarningFill
+                                                                            fontSize="1.2rem"
+                                                                            className="inline-block text-danger"
+                                                                        />
+                                                                        Inactive
+                                                                    </div>
+                                                                )}
                                                             </span>
+
                                                             <span>
-                                                                {singleVerification?.mx_record
-                                                                    ? singleVerification?.mx_record
-                                                                    : '-'}
+                                                                {singleVerification?.mx_record ? (
+                                                                    <div className="flex gap-1">
+                                                                        <RiCheckboxCircleFill
+                                                                            fontSize="1.2rem"
+                                                                            className="inline-block text-success"
+                                                                        />
+                                                                        {
+                                                                            singleVerification?.mx_record
+                                                                        }
+                                                                    </div>
+                                                                ) : (
+                                                                    <div className="flex gap-1">
+                                                                        <RiErrorWarningFill
+                                                                            fontSize="1.2rem"
+                                                                            className="inline-block text-danger"
+                                                                        />
+                                                                        No MX Record
+                                                                    </div>
+                                                                )}
                                                             </span>
                                                         </div>
                                                     </div>

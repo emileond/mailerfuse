@@ -54,7 +54,6 @@ function SettingsPage() {
     };
 
     useEffect(() => {
-        console.log(currentWorkspace);
         if (currentWorkspace?.name) {
             setValue('workspace_name', currentWorkspace.name);
         }
