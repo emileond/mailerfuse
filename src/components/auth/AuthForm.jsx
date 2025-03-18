@@ -7,7 +7,7 @@ import { useLoginUser, useRegisterUser } from '../../hooks/react-query/user/useU
 import Logo from '../Logo';
 import ky from 'ky';
 
-function AuthForm({ viewMode = 'signup' }) {
+function AuthForm({ viewMode = 'signup', hideHeader }) {
     const { mutateAsync: registerUser } = useRegisterUser();
     const { mutateAsync: loginUser } = useLoginUser();
     const {
@@ -99,23 +99,31 @@ function AuthForm({ viewMode = 'signup' }) {
     }
     return (
         <div>
-            <RouterLink to="/">
-                <Logo />
-            </RouterLink>
+            {!hideHeader && (
+                <RouterLink to="/">
+                    <Logo />
+                </RouterLink>
+            )}
             <form onSubmit={handleSubmit(onSubmit)} className="min-w-96 flex flex-col gap-4 py-8">
-                <h2 className="text-3xl font-bold">
-                    {view === 'signup' ? 'Create an account' : 'Login'}
-                </h2>
-                <Link
-                    className="hover:cursor-pointer hover:text-primary-600 p-2"
-                    color="primary"
-                    variant="light"
-                    onClick={view === 'signup' ? () => setView('login') : () => setView('signup')}
-                >
-                    {view === 'signup'
-                        ? 'Already have an account? Login'
-                        : "Don't have an account? Sign up"}
-                </Link>
+                {!hideHeader && (
+                    <>
+                        <h2 className="text-3xl font-bold">
+                            {view === 'signup' ? 'Create an account' : 'Login'}
+                        </h2>
+                        <Link
+                            className="hover:cursor-pointer hover:text-primary-600 p-2"
+                            color="primary"
+                            variant="light"
+                            onClick={
+                                view === 'signup' ? () => setView('login') : () => setView('signup')
+                            }
+                        >
+                            {view === 'signup'
+                                ? 'Already have an account? Login'
+                                : "Don't have an account? Sign up"}
+                        </Link>
+                    </>
+                )}
                 {error && (
                     <div className="flex items-center gap-2 bg-danger-50 p-3 rounded-xl border border-danger-100 font-bold text-default-900 text-sm">
                         <PiWarningBold className="text-danger-300 text-2xl" />
