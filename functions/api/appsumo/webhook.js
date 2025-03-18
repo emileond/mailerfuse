@@ -19,7 +19,7 @@ export async function onRequestPost(context) {
 
         // Validate input
         if (!license_key || !event) {
-            return new Response.json(
+            return Response.json(
                 { error: 'Missing required fields' },
                 {
                     status: 400,
@@ -88,7 +88,7 @@ export async function onRequestPost(context) {
 
         // Check if the event exists
         if (!eventHandlers[event]) {
-            return new Response.json({ error: 'Invalid event type' }, { status: 400 });
+            return Response.json({ error: 'Invalid event type' }, { status: 400 });
         }
 
         // Execute the corresponding database operation
@@ -97,11 +97,11 @@ export async function onRequestPost(context) {
 
         // Handle Supabase errors
         if (error) {
-            return new Response.json({ error: error.message }, { status: 500 });
+            return Response.json({ error: error.message }, { status: 500 });
         }
 
-        return new Response.json({ event, success: true }, { status: 200 });
+        return Response.json({ event, success: true }, { status: 200 });
     } catch (error) {
-        return new Response.json({ error: error.message }, { status: 500 });
+        return Response.json({ error: error.message }, { status: 500 });
     }
 }
