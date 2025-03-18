@@ -37,8 +37,8 @@ function AppsumoPage() {
                 })
                 .json();
 
-            if (response.license) {
-                setLicense(response.license);
+            if (response.license_key) {
+                setLicense(response.license_key);
             } else {
                 setError(
                     response.error_description || response.error || 'Failed to retrieve license',
@@ -97,8 +97,8 @@ function AppsumoPage() {
                                 {license && (
                                     <Alert
                                         color="success"
-                                        title="LTD Plan Activated!"
-                                        description={`Your license key: ${license.license_key}`}
+                                        title="AppSumo Plan Activated!"
+                                        description="Congratulations! Your AppSumo Lifetime Deal plan is now active and ready to use."
                                     />
                                 )}
                                 <CardFooter>
