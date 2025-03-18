@@ -1,22 +1,31 @@
-import { useLocation } from 'react-router-dom';
-import { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useCallback, useState } from 'react';
 import ky from 'ky';
 import NavBar from '../components/marketing/Nav.jsx';
 import Footer from '../components/marketing/Footer.jsx';
-import { useUser } from '../hooks/react-query/user/useUser.js';
+import { useUser, useLogout } from '../hooks/react-query/user/useUser.js';
 import { useWorkspaces } from '../hooks/react-query/teams/useWorkspaces.js';
 import AuthForm from '../components/auth/AuthForm.jsx';
 import { Alert, Button, Card, CardBody, CardFooter, CardHeader, Link } from '@heroui/react';
+import { useQueryClient } from '@tanstack/react-query';
 
 function AppsumoPage() {
     const { data: user } = useUser();
     const { data: workspaces } = useWorkspaces(user);
+    const queryClient = useQueryClient();
     const location = useLocation();
+    const navigate = useNavigate(); // <-- Use useNavigate hook
     const queryParams = new URLSearchParams(location.search);
     const code = queryParams.get('code');
     const [license, setLicense] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
+    const { mutateAsync: logoutUser } = useLogout();
+
+    const handleLogout = useCallback(async () => {
+        await logoutUser();
+        await queryClient.invalidateQueries();
+    }, [logoutUser, queryClient]);
 
     async function fetchLicense() {
         if (!code) {
@@ -39,6 +48,8 @@ function AppsumoPage() {
 
             if (response.license_key) {
                 setLicense(response.license_key);
+                // Redirect to /dashboard when the license is activated
+                navigate('/dashboard'); // <-- Redirect here
             } else {
                 setError(
                     response.error_description || response.error || 'Failed to retrieve license',
@@ -84,7 +95,7 @@ function AppsumoPage() {
                             </div>
                         ) : (
                             <div className="flex flex-col gap-6 items-center max-w-2xl">
-                                {!error && (
+                                {!error && !license && (
                                     <Alert
                                         color="primary"
                                         title={`You're about to activate the LTD plan on: ${user?.email}`}
@@ -102,27 +113,27 @@ function AppsumoPage() {
                                     />
                                 )}
                                 <CardFooter>
-                                    <div className="w-full flex flex-col items-center gap-3">
-                                        <Button
-                                            color="secondary"
-                                            size="lg"
-                                            isLoading={isLoading}
-                                            onPress={fetchLicense}
-                                        >
-                                            Confirm and Activate LTD Plan
-                                        </Button>
-                                        <span className="text-gray-500">OR</span>
-                                        <Button
-                                            isDisabled={isLoading}
-                                            variant="bordered"
-                                            size="lg"
-                                            onPress={() => {
-                                                /* Add logout functionality here */
-                                            }}
-                                        >
-                                            Log out
-                                        </Button>
-                                    </div>
+                                    {!license && (
+                                        <div className="w-full flex flex-col items-center gap-3">
+                                            <Button
+                                                color="secondary"
+                                                size="lg"
+                                                isLoading={isLoading}
+                                                onPress={fetchLicense}
+                                            >
+                                                Confirm and Activate LTD Plan
+                                            </Button>
+                                            <span className="text-gray-500">OR</span>
+                                            <Button
+                                                isDisabled={isLoading}
+                                                variant="bordered"
+                                                size="lg"
+                                                onPress={handleLogout}
+                                            >
+                                                Log out
+                                            </Button>
+                                        </div>
+                                    )}
                                 </CardFooter>
                             </div>
                         )}
