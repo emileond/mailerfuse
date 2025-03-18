@@ -1,36 +1,41 @@
 import { useLocation } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import ky from 'ky';
 import NavBar from '../components/marketing/Nav.jsx';
 import Footer from '../components/marketing/Footer.jsx';
 import { useUser } from '../hooks/react-query/user/useUser.js';
+import { useWorkspaces } from '../hooks/react-query/teams/useWorkspaces.js';
 import AuthForm from '../components/auth/AuthForm.jsx';
 import { Alert, Button, Card, CardBody, CardFooter, CardHeader, Link } from '@heroui/react';
 
 function AppsumoPage() {
     const { data: user } = useUser();
+    const { data: workspaces } = useWorkspaces(user);
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const code = queryParams.get('code');
     const [license, setLicense] = useState(null);
-    const [loading, setLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
 
     async function fetchLicense() {
-        if (!code) return;
+        if (!code) {
+            setError('Appsumo code is missing');
+            return;
+        }
 
-        setLoading(true);
+        const { workspace_id } = workspaces.find((w) => w.role === 'owner');
+
+        setIsLoading(true);
         setError(null);
 
         try {
             const response = await ky
                 .post('/api/appsumo/get-user-license', {
-                    json: { code },
+                    json: { code, workspace_id, user_id: user.id },
                     throwHttpErrors: false, // Prevent ky from throwing on non-2xx responses
                 })
                 .json();
-
-            console.log('Response:', response);
 
             if (response.license) {
                 setLicense(response.license);
@@ -44,7 +49,7 @@ function AppsumoPage() {
             console.error('Request failed:', err);
             setError(err.message || 'An error occurred while fetching the license.');
         } finally {
-            setLoading(false);
+            setIsLoading(false);
         }
     }
 
@@ -55,7 +60,7 @@ function AppsumoPage() {
                 <Card shadow="sm" className="p-4">
                     <CardHeader className="flex flex-col gap-3">
                         <h1 className="font-bold">Welcome Sumo-ling!</h1>
-                        <p>You're one step away from activating your LTD plan.</p>
+                        <p>{`You're one step away from activating your LTD plan.`}</p>
                     </CardHeader>
                     <CardBody>
                         {!user ? (
@@ -101,13 +106,14 @@ function AppsumoPage() {
                                         <Button
                                             color="secondary"
                                             size="lg"
-                                            isLoading={loading}
+                                            isLoading={isLoading}
                                             onPress={fetchLicense}
                                         >
                                             Confirm and Activate LTD Plan
                                         </Button>
                                         <span className="text-gray-500">OR</span>
                                         <Button
+                                            isDisabled={isLoading}
                                             variant="bordered"
                                             size="lg"
                                             onPress={() => {

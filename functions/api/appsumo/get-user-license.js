@@ -1,11 +1,12 @@
 import ky from 'ky';
+import { createClient } from '@supabase/supabase-js';
 
 export async function onRequestPost(context) {
     try {
         const body = await context.request.json();
-        const { code } = body;
-        if (!code) {
-            return new Response(JSON.stringify({ error: 'Missing authorization code' }), {
+        const { code, user_id, workspace_id } = body;
+        if ((!code, !user_id, !workspace_id)) {
+            return new Response(JSON.stringify({ error: 'Missing fields' }), {
                 status: 400,
                 headers: { 'Content-Type': 'application/json' },
             });
@@ -43,22 +44,40 @@ export async function onRequestPost(context) {
             )
             .json();
 
-        console.log('License Response:', licenseResponse);
+        console.log('License Response:', tokenResponse);
 
-        return new Response(JSON.stringify(licenseResponse), {
+        if (licenseResponse.license_key) {
+            const supabase = createClient(
+                context.env.SUPABASE_URL,
+                context.env.SUPABASE_SERVICE_KEY,
+            );
+
+            // link license to user data
+            const { error } = await supabase
+                .from('appsumo_licenses')
+                .update({
+                    user_id,
+                    workspace_id,
+                })
+                .eq('license_key', licenseResponse.license_key);
+
+            // Handle Supabase errors
+            if (error) {
+                return new Response.json({ error: error.message }, { status: 500 });
+            }
+        }
+
+        return new Response.json(licenseResponse, {
             status: 200,
-            headers: { 'Content-Type': 'application/json' },
         });
     } catch (error) {
-        console.error('Server Error:', error);
-        return new Response(
-            JSON.stringify({
+        return new Response.json(
+            {
                 error: 'Internal server error',
                 details: error.message || JSON.stringify(error),
-            }),
+            },
             {
                 status: 500,
-                headers: { 'Content-Type': 'application/json' },
             },
         );
     }
