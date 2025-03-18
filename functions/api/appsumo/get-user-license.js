@@ -6,10 +6,13 @@ export async function onRequestPost(context) {
         const body = await context.request.json();
         const { code, user_id, workspace_id } = body;
         if ((!code, !user_id, !workspace_id)) {
-            return new Response(JSON.stringify({ error: 'Missing fields' }), {
-                status: 400,
-                headers: { 'Content-Type': 'application/json' },
-            });
+            return Response.json(
+                { error: 'Missing fields' },
+                {
+                    status: 400,
+                    headers: { 'Content-Type': 'application/json' },
+                },
+            );
         }
 
         // Step 1: Exchange code for access token
@@ -30,7 +33,7 @@ export async function onRequestPost(context) {
         console.log('Token Response:', tokenResponse);
 
         if (tokenResponse.error) {
-            return new Response(JSON.stringify(tokenResponse), {
+            return Response.json(tokenResponse, {
                 status: 400,
                 headers: { 'Content-Type': 'application/json' },
             });
@@ -63,15 +66,15 @@ export async function onRequestPost(context) {
 
             // Handle Supabase errors
             if (error) {
-                return new Response.json({ error: error.message }, { status: 500 });
+                return Response.json({ error: error.message }, { status: 500 });
             }
         }
 
-        return new Response.json(licenseResponse, {
+        return Response.json(licenseResponse, {
             status: 200,
         });
     } catch (error) {
-        return new Response.json(
+        return Response.json(
             {
                 error: 'Internal server error',
                 details: error.message || JSON.stringify(error),
