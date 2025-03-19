@@ -1,7 +1,5 @@
 import {
     Button,
-    Card,
-    CardBody,
     Chip,
     Modal,
     ModalBody,
@@ -19,8 +17,9 @@ import {
     useUpdateWorkspaceMember,
 } from '../../hooks/react-query/teams/useWorkspaceMembers.js';
 import useCurrentWorkspace from '../../hooks/useCurrentWorkspace';
+import { useCallback } from 'react';
 
-function MemberCard({ member, onEditMember }) {
+function MemberCard({ member, onEditMember, columnKey }) {
     const [currentWorkspace] = useCurrentWorkspace();
     const { onOpen, isOpen, onOpenChange, onClose } = useDisclosure();
     const { mutateAsync: deleteWorkspaceMember, isPending: isDeleting } =
@@ -62,70 +61,106 @@ function MemberCard({ member, onEditMember }) {
         onEditMember(member);
     };
 
+    const roleColorMap = {
+        owner: 'text-primary',
+        admin: 'text-default-600',
+        member: 'text-default-600',
+    };
+
+    const renderCell = useCallback((member, columnKey) => {
+        const cellValue = member[columnKey];
+
+        switch (columnKey) {
+            case 'name':
+                return (
+                    <User
+                        className="align-middle"
+                        name={member.name || member.email.split('@')[0]}
+                        description={member.email}
+                        avatarProps={{
+                            src: member?.avatar,
+                        }}
+                    />
+                );
+            case 'role':
+                return (
+                    <div className="flex flex-col">
+                        <Chip
+                            className={`capitalize ${roleColorMap[cellValue]}`}
+                            size="sm"
+                            variant="light"
+                            // startContent={roleIconMap[cellValue]}
+                        >
+                            {cellValue}
+                        </Chip>
+                    </div>
+                );
+            case 'status':
+                return (
+                    <Chip
+                        className="capitalize"
+                        color={cellValue === 'active' ? 'success' : 'primary'}
+                        size="sm"
+                        variant="flat"
+                    >
+                        {cellValue}
+                    </Chip>
+                );
+            case 'actions':
+                return (
+                    <div
+                        className={`flex items-center justify-end gap-1 ${member.role === 'owner' && 'hidden'}`}
+                    >
+                        {member.status === 'pending' && (
+                            <Tooltip content="Resend invite">
+                                <Button
+                                    variant="light"
+                                    size="md"
+                                    isIconOnly
+                                    isDisabled={
+                                        new Date(member.updated_at).getTime() >
+                                        Date.now() - 24 * 60 * 60 * 1000
+                                    }
+                                    onPress={() => handleUpdate(member.email, true)}
+                                    isLoading={isUpdating}
+                                >
+                                    <RiMailSendLine className="text-default-600 text-lg" />
+                                </Button>
+                            </Tooltip>
+                        )}
+                        <Tooltip content="Edit user">
+                            <Button
+                                variant="light"
+                                size="sm"
+                                isIconOnly
+                                onPress={handleOnEdit}
+                                isDisabled={member.role === 'owner'}
+                            >
+                                <RiEditLine className="text-default-600 text-lg" />
+                            </Button>
+                        </Tooltip>
+                        <Tooltip content="Delete user">
+                            <Button
+                                color="danger"
+                                variant="light"
+                                size="md"
+                                isIconOnly
+                                onPress={onOpen}
+                                isDisabled={member.role === 'owner'}
+                            >
+                                <RiDeleteBin6Line className="text-lg" />
+                            </Button>
+                        </Tooltip>
+                    </div>
+                );
+            default:
+                return cellValue;
+        }
+    });
+
     return (
         <>
-            <Card shadow="sm">
-                <CardBody>
-                    <div className="flex gap-1 items-center justify-between">
-                        <User
-                            name={member.name || member.email.split('@')[0]}
-                            description={member.email}
-                            avatarProps={{
-                                src: member?.avatar,
-                            }}
-                        />
-                        <span className="text-default-500">{member.role}</span>
-                        <Chip
-                            color={member.status === 'active' ? 'success' : 'default'}
-                            variant="flat"
-                        >
-                            {member.status}
-                        </Chip>
-                        <div className="flex gap-3 items-center">
-                            {member.status === 'pending' && (
-                                <Tooltip content="Resend invite">
-                                    <Button
-                                        variant="light"
-                                        size="md"
-                                        isIconOnly
-                                        isDisabled={
-                                            new Date(member.updated_at).getTime() >
-                                            Date.now() - 24 * 60 * 60 * 1000
-                                        }
-                                        onPress={() => handleUpdate(member.email, true)}
-                                        isLoading={isUpdating}
-                                    >
-                                        <RiMailSendLine className="text-lg" />
-                                    </Button>
-                                </Tooltip>
-                            )}
-                            <Tooltip content="Edit">
-                                <Button
-                                    variant="light"
-                                    size="md"
-                                    isIconOnly
-                                    onPress={handleOnEdit}
-                                    isDisabled={member.role === 'owner'}
-                                >
-                                    <RiEditLine className="text-lg" />
-                                </Button>
-                            </Tooltip>
-                            <Tooltip content="Delete">
-                                <Button
-                                    color="danger"
-                                    variant="light"
-                                    size="md"
-                                    isIconOnly
-                                    onPress={onOpen}
-                                    isDisabled={member.role === 'owner'}
-                                >
-                                    <RiDeleteBin6Line className="text-lg" />
-                                </Button>
-                            </Tooltip>
-                        </div>
-                    </div>
-                </CardBody>
-            </Card>
+            {renderCell(member, columnKey)}
             <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
                 <ModalContent>
                     <ModalHeader>Remove user</ModalHeader>
