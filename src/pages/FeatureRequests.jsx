@@ -48,6 +48,10 @@ function FeatureRequestsPage() {
             });
         } catch (e) {
             console.log(e);
+            toast('Failed to submit idea', {
+                type: 'error',
+                icon: '❌',
+            });
         }
     };
 
