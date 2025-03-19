@@ -74,7 +74,7 @@ function FeatureRequestsPage() {
                         <div className="space-y-2">
                             <h2 className={`text-lg font-semibold`}>Add your idea</h2>
                             <p className="text-default-600">
-                                This could be a problem you're having or something you wish was
+                                This could be a problem you&apos;re having or something you wish was
                                 possible with {import.meta.env.VITE_APP_NAME}
                             </p>
                         </div>
