@@ -11,6 +11,7 @@ import { useUserProfile } from '../hooks/react-query/user/useUserProfile.js';
 import { useUpdateUserProfile } from '../hooks/react-query/user/useUserProfile.js';
 import { useForm, Controller } from 'react-hook-form';
 import toast from 'react-hot-toast';
+import EmptyState from '../components/EmptyState.jsx';
 
 function ProfilePage() {
     const { data: user } = useUser();
@@ -124,9 +125,16 @@ function ProfilePage() {
                     </Tab>
                     <Tab key="invitations" title="Invitations">
                         <div className="flex flex-col gap-3">
-                            {invitations?.map((inv) => (
-                                <InvitationCard key={inv.id} invitation={inv} />
-                            ))}
+                            {invitations?.length ? (
+                                invitations?.map((inv) => (
+                                    <InvitationCard key={inv.id} invitation={inv} />
+                                ))
+                            ) : (
+                                <EmptyState
+                                    title="No Invitations"
+                                    description="When you receive an invitation to join another workspace, it will appear here."
+                                />
+                            )}
                         </div>
                     </Tab>
                 </Tabs>
