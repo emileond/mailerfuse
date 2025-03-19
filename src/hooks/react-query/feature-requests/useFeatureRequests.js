@@ -51,6 +51,5 @@ export const useCreateFeatureRequest = (user) => {
             // Invalidate and refetch the email lists query for the team
             queryClient.invalidateQueries(['featureRequests', user?.id]);
         },
-        enabled: !!user, // only allow if theres a user
     });
 };
