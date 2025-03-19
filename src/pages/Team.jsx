@@ -11,14 +11,19 @@ import {
     useDisclosure,
     Select,
     SelectItem,
-} from "@heroui/react";
+    Table,
+    TableHeader,
+    TableColumn,
+    TableBody,
+    TableRow,
+    TableCell,
+} from '@heroui/react';
 import useCurrentWorkspace from '../hooks/useCurrentWorkspace';
 import {
     useWorkspaceMembers,
     useAddWorkspaceMember,
     useUpdateWorkspaceMember,
 } from '../hooks/react-query/teams/useWorkspaceMembers';
-import EmptyState from '../components/EmptyState';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import MemberCard from '../components/team/MemberCard';
@@ -102,6 +107,13 @@ function TeamPage() {
         onOpen();
     };
 
+    const columns = [
+        { name: 'Name', uid: 'name' },
+        { name: 'Role', uid: 'role' },
+        { name: 'Status', uid: 'status' },
+        { name: 'Actions', uid: 'actions' },
+    ];
+
     return (
         <AppLayout>
             <PageLayout
@@ -112,26 +124,34 @@ function TeamPage() {
                 onClick={handleAddMember}
             >
                 <div className="flex flex-col gap-3 mb-12">
-                    <span className="text-sm text-default-600">
-                        {workspaceMembers?.length}{' '}
-                        {workspaceMembers?.length === 1 ? 'member' : 'members'}
-                    </span>
-                    {workspaceMembers?.length ? (
-                        workspaceMembers.map((member) => (
-                            <MemberCard
-                                key={member.id}
-                                member={member}
-                                onEditMember={(m) => handleEditMember(m)}
-                            />
-                        ))
-                    ) : (
-                        <EmptyState
-                            title="No team members found"
-                            description="Invite team members to get started"
-                            primaryAction="Invite member"
-                            onClick={onOpen}
-                        />
-                    )}
+                    <Table aria-label="Example table with custom cells">
+                        <TableHeader columns={columns}>
+                            {(column) => (
+                                <TableColumn
+                                    key={column.uid}
+                                    align={column.uid === 'actions' ? 'center' : 'start'}
+                                >
+                                    {column.name}
+                                </TableColumn>
+                            )}
+                        </TableHeader>
+                        <TableBody items={workspaceMembers || []}>
+                            {(member) => (
+                                <TableRow key={member.id} className="border-b-1 last:border-b-0">
+                                    {(columnKey) => (
+                                        <TableCell>
+                                            <MemberCard
+                                                key={member.id}
+                                                member={member}
+                                                columnKey={columnKey}
+                                                onEditMember={(m) => handleEditMember(m)}
+                                            />
+                                        </TableCell>
+                                    )}
+                                </TableRow>
+                            )}
+                        </TableBody>
+                    </Table>
                 </div>
                 <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
                     <ModalContent>
