@@ -24,6 +24,8 @@ import TakuWidget from './components/marketing/TakuWidget.js';
 import PrivacyPolicyPage from './pages/PrivacyPolicy.jsx';
 import TOSPage from './pages/TOS.jsx';
 import AUPolicyPage from './pages/AUPolicyPage.jsx';
+import RoadmapPage from './pages/Roadmap.jsx';
+import FeatureRequestsPage from './pages/FeatureRequests.jsx';
 
 function App() {
     const { isLoading } = useUser();
@@ -89,6 +91,14 @@ function App() {
                     <ApiPage />
                 </ProtectedRoute>
             ),
+        },
+        {
+            path: '/roadmap',
+            element: <RoadmapPage />,
+        },
+        {
+            path: '/feature-requests',
+            element: <FeatureRequestsPage />,
         },
         {
             path: '/team',
