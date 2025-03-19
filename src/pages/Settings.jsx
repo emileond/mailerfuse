@@ -9,6 +9,7 @@ import {
     CardHeader,
     Divider,
     Input,
+    Progress,
 } from '@heroui/react';
 import useCurrentWorkspace from '../hooks/useCurrentWorkspace.js';
 import { useWorkspaceCredits } from '../hooks/react-query/credits/useWorkspaceCredits.js';
@@ -17,6 +18,8 @@ import { useEffect, useState } from 'react';
 import { useUpdateWorkspace } from '../hooks/react-query/teams/useWorkspaces.js';
 import toast from 'react-hot-toast';
 import Paywall from '../components/marketing/Paywall.jsx';
+import { MdCelebration } from 'react-icons/md';
+import dayjs from 'dayjs';
 
 function SettingsPage() {
     const [currentWorkspace] = useCurrentWorkspace();
@@ -124,31 +127,56 @@ function SettingsPage() {
                         <CardHeader>
                             <h4 className="font-medium">Billing</h4>
                         </CardHeader>
-                        <CardBody className="flex flex-col gap-1">
-                            <div className="flex items-center justify-between bg-content2 p-3 rounded-xl">
-                                <div>
-                                    <small>Available credits</small>
-                                    <h3 className="text-xl font-semibold">
-                                        {Intl.NumberFormat().format(credits?.available_credits)}
-                                    </h3>
+                        <CardBody className="flex flex-col gap-1 pb-1">
+                            <div className="flex flex-col gap-3 bg-gradient-to-b from-primary-50 to-blue-50/10 p-3 rounded-xl">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <small>Available credits</small>
+                                        <h3 className="text-xl font-semibold">
+                                            {Intl.NumberFormat().format(credits?.available_credits)}
+                                        </h3>
+                                    </div>
                                 </div>
-                                <Button
-                                    variant="ghost"
-                                    color="primary"
+                                <Progress
+                                    aria-label="credits usage"
                                     size="sm"
-                                    onPress={() => setIsPaywallOpen(true)}
-                                    isDisabled={currentWorkspace?.is_ltd}
-                                >
-                                    Get more
-                                </Button>
-                            </div>
-                            {currentWorkspace?.is_ltd && (
-                                <Alert
-                                    title={`You have access to the Lifetime ${currentWorkspace?.ltd_plan}`}
-                                    description="Credits renew each month"
+                                    color="primary"
+                                    minValue={0}
+                                    maxValue={25000}
+                                    value={credits?.available_credits}
+                                    className="my-2"
                                 />
-                            )}
+                            </div>
                         </CardBody>
+                        <CardFooter className="pt-0">
+                            {currentWorkspace?.is_ltd ? (
+                                <Alert
+                                    color="primary"
+                                    variant="faded"
+                                    title={`You have access to the LTD ${currentWorkspace?.ltd_plan}`}
+                                    description={`Your credits will renew on ${Intl.DateTimeFormat(
+                                        navigator.language,
+                                        {
+                                            dateStyle: 'long',
+                                        },
+                                    ).format(dayjs(credits?.updated_at).add(1, 'month'))}`}
+                                    icon={<MdCelebration fontSize="1.4rem" />}
+                                    radius="full"
+                                />
+                            ) : (
+                                <div className="w-full flex justify-center">
+                                    <Button
+                                        variant="solid"
+                                        color="primary"
+                                        size="sm"
+                                        onPress={() => setIsPaywallOpen(true)}
+                                        isDisabled={currentWorkspace?.is_ltd}
+                                    >
+                                        Get more credits
+                                    </Button>
+                                </div>
+                            )}
+                        </CardFooter>
                         <Divider />
                     </Card>
                 </div>
