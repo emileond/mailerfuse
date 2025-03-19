@@ -10,7 +10,7 @@ const fetchWorkspaceCredits = async (workspace_id) => {
         .single();
 
     if (error) {
-        throw new Error('Failed to fetch email lists');
+        throw new Error('Failed to fetch workspace credits');
     }
 
     return data;
