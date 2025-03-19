@@ -9,6 +9,12 @@ import {
     SelectItem,
     Chip,
     Divider,
+    Modal,
+    ModalContent,
+    ModalHeader,
+    ModalBody,
+    ModalFooter,
+    useDisclosure,
 } from '@heroui/react';
 import Footer from '../components/marketing/Footer.jsx';
 import { RiArrowUpFill, RiCircleFill } from 'react-icons/ri';
@@ -18,12 +24,14 @@ import { useUser } from '../hooks/react-query/user/useUser.js';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
+import AuthForm from '../components/auth/AuthForm.jsx';
 
 function FeatureRequestsPage() {
     const [status, setStatus] = useState('idea');
     const { data: user } = useUser();
     const { data: items, refetch } = useFeatureRequests(user, [status]);
     const { mutateAsync: createFeatureRequest, isPending } = useCreateFeatureRequest(user);
+    const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
     const {
         register,
@@ -33,7 +41,10 @@ function FeatureRequestsPage() {
     } = useForm();
 
     const onSubmit = async (data) => {
-        if (!user) return;
+        if (!user) {
+            onOpen();
+            return;
+        }
 
         try {
             await createFeatureRequest({
@@ -65,9 +76,18 @@ function FeatureRequestsPage() {
         refetch();
     }, [status]);
 
+    console.log(errors);
+
     return (
         <div className="w-screen min-h-screen bg-content1">
             <NavBar />
+            <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+                <ModalContent>
+                    <ModalBody>
+                        <AuthForm hideLogo onSuccess={() => onOpenChange()} />
+                    </ModalBody>
+                </ModalContent>
+            </Modal>
             <div className="container mx-auto max-w-[1280px] px-6">
                 <h1 className="text-left text-4xl font-bold pt-12 pb-6">Suggest a feature</h1>
                 <p className="font-medium">
@@ -88,16 +108,20 @@ function FeatureRequestsPage() {
                             className="mt-14 space-y-6"
                         >
                             <Input
-                                {...register('title', { required: true })}
+                                {...register('title', { required: 'Required field' })}
                                 label="Title"
                                 labelPlacement="outside"
                                 placeholder="Keep it short"
+                                isInvalid={!!errors?.title}
+                                errorMessage={errors?.title?.message}
                             />
                             <Textarea
-                                {...register('description', { required: true })}
+                                {...register('description', { required: 'Required field' })}
                                 label="Description"
                                 labelPlacement="outside"
                                 placeholder="What do you need this for? Why is it important for you?"
+                                isInvalid={!!errors?.description}
+                                errorMessage={errors?.description?.message}
                             />
                             <Button
                                 type="submit"

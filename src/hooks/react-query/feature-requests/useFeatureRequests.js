@@ -9,10 +9,34 @@ const fetchFeatureRequests = async (statusList) => {
         .in('status', statusList);
 
     if (error) {
-        throw new Error('Failed to fetch email lists');
+        throw new Error('Failed to fetch feature requests');
     }
 
     return data;
+};
+
+// Fetch the number of votes and if the user has voted for the feature request
+const fetchVotesForFeatureRequest = async (featureRequestId, userId) => {
+    const { data, error } = await supabaseClient
+        .from('feature_request_votes')
+        .select('id')
+        .eq('request_id', featureRequestId)
+        .eq('user_id', userId)
+        .single(); // Assumes user can vote only once per feature request
+
+    const { count: voteCount, error: voteError } = await supabaseClient
+        .from('feature_request_votes')
+        .select('id', { count: 'exact' })
+        .eq('request_id', featureRequestId);
+
+    if (error || voteError) {
+        throw new Error('Failed to fetch votes');
+    }
+
+    return {
+        hasVoted: data ? true : false,
+        voteCount,
+    };
 };
 
 // Hook to fetch feature requests
@@ -24,7 +48,16 @@ export const useFeatureRequests = (user, statusList) => {
     });
 };
 
-// Function to create a new api key
+// Hook to fetch votes for a specific feature request and check if the user has voted
+export const useVotesForFeatureRequest = (featureRequestId, userId) => {
+    return useQuery({
+        queryKey: ['featureRequestVotes', featureRequestId, userId],
+        queryFn: () => fetchVotesForFeatureRequest(featureRequestId, userId),
+        enabled: !!userId, // Only run if userId is available
+    });
+};
+
+// Function to create a new feature request
 const createFeatureRequest = async ({ title, description, user_id }) => {
     const { error } = await supabaseClient.from('feature_requests').insert([
         {
@@ -41,15 +74,57 @@ const createFeatureRequest = async ({ title, description, user_id }) => {
     }
 };
 
-// Hook to create a new api key
+// Hook to create a new feature request
 export const useCreateFeatureRequest = (user) => {
     const queryClient = useQueryClient();
 
     return useMutation({
         mutationFn: createFeatureRequest,
         onSuccess: () => {
-            // Invalidate and refetch the email lists query for the team
+            // Invalidate and refetch the feature requests query for the user
             queryClient.invalidateQueries(['featureRequests', user?.id]);
+        },
+    });
+};
+
+// Function to vote or unvote on a feature request
+const voteOnFeatureRequest = async (featureRequestId, userId, hasVoted) => {
+    if (hasVoted) {
+        const { error } = await supabaseClient
+            .from('feature_request_votes')
+            .delete()
+            .eq('request_id', featureRequestId)
+            .eq('user_id', userId);
+
+        if (error) {
+            console.error('Error unvoting feature request:', error);
+            throw new Error('Failed to unvote');
+        }
+    } else {
+        const { error } = await supabaseClient.from('feature_request_votes').insert([
+            {
+                request_id: featureRequestId,
+                user_id: userId,
+            },
+        ]);
+
+        if (error) {
+            console.error('Error voting feature request:', error);
+            throw new Error('Failed to vote');
+        }
+    }
+};
+
+// Hook to vote/unvote on a feature request
+export const useVoteOnFeatureRequest = (featureRequestId, userId) => {
+    const { data: voteData } = useVotesForFeatureRequest(featureRequestId, userId);
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: () => voteOnFeatureRequest(featureRequestId, userId, voteData?.hasVoted),
+        onSuccess: () => {
+            // Invalidate and refetch the feature requests query for the user
+            queryClient.invalidateQueries(['featureRequests', userId]);
         },
     });
 };
