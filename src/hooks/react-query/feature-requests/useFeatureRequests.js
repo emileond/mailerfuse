@@ -136,8 +136,5 @@ export const useVoteOnFeatureRequest = () => {
 
     return useMutation({
         mutationFn: voteOnFeatureRequest,
-        onSuccess: () => {
-            queryClient.cancelQueries();
-        },
     });
 };
