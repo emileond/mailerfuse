@@ -17,24 +17,20 @@ const fetchFeatureRequests = async (statusList) => {
 
 // Fetch the number of votes and if the user has voted for the feature request
 const fetchVotesForFeatureRequest = async (featureRequestId, userId) => {
-    const { data, error } = await supabaseClient
+    const { data } = await supabaseClient
         .from('feature_request_votes')
         .select('id')
         .eq('request_id', featureRequestId)
         .eq('user_id', userId)
         .single(); // Assumes user can vote only once per feature request
 
-    const { count: voteCount, error: voteError } = await supabaseClient
+    const { count: voteCount } = await supabaseClient
         .from('feature_request_votes')
         .select('id', { count: 'exact' })
         .eq('request_id', featureRequestId);
 
-    if (error || voteError) {
-        throw new Error('Failed to fetch votes');
-    }
-
     return {
-        hasVoted: data ? true : false,
+        hasVoted: !!data,
         voteCount,
     };
 };
@@ -51,9 +47,10 @@ export const useFeatureRequests = (user, statusList) => {
 // Hook to fetch votes for a specific feature request and check if the user has voted
 export const useVotesForFeatureRequest = (featureRequestId, userId) => {
     return useQuery({
-        queryKey: ['featureRequestVotes', featureRequestId, userId],
+        queryKey: ['featureRequestVotes', featureRequestId],
         queryFn: () => fetchVotesForFeatureRequest(featureRequestId, userId),
-        enabled: !!userId, // Only run if userId is available
+        staleTime: 1000 * 60 * 20, // 20 min
+        // enabled: !!userId, // Only run if userId is available
     });
 };
 
@@ -88,7 +85,8 @@ export const useCreateFeatureRequest = (user) => {
 };
 
 // Function to vote or unvote on a feature request
-const voteOnFeatureRequest = async (featureRequestId, userId, hasVoted) => {
+const voteOnFeatureRequest = async ({ featureRequestId, userId, hasVoted }) => {
+    console.log('voting', featureRequestId, userId, hasVoted);
     if (hasVoted) {
         const { error } = await supabaseClient
             .from('feature_request_votes')
@@ -116,15 +114,15 @@ const voteOnFeatureRequest = async (featureRequestId, userId, hasVoted) => {
 };
 
 // Hook to vote/unvote on a feature request
-export const useVoteOnFeatureRequest = (featureRequestId, userId) => {
-    const { data: voteData } = useVotesForFeatureRequest(featureRequestId, userId);
+export const useVoteOnFeatureRequest = (featureRequestId) => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: () => voteOnFeatureRequest(featureRequestId, userId, voteData?.hasVoted),
+        mutationFn: voteOnFeatureRequest,
         onSuccess: () => {
+            queryClient.cancelQueries();
             // Invalidate and refetch the feature requests query for the user
-            queryClient.invalidateQueries(['featureRequests', userId]);
+            // queryClient.invalidateQueries(['featureRequestVotes', featureRequestId]);
         },
     });
 };

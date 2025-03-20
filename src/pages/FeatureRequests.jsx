@@ -25,6 +25,7 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import AuthForm from '../components/auth/AuthForm.jsx';
+import FeatureRequestCard from '../components/roadmap/FeatureRequestCard.jsx';
 
 function FeatureRequestsPage() {
     const [status, setStatus] = useState('idea');
@@ -185,27 +186,7 @@ function FeatureRequestsPage() {
                         <Divider className="my-3" />
                         <div className="space-y-3">
                             {items?.map((item) => (
-                                <Card key={item.id} shadow="sm">
-                                    <CardBody className="p-0">
-                                        <div className="flex items-start gap-0 h-32">
-                                            <div
-                                                className="flex flex-col justify-center hover:bg-content2 cursor-pointer p-4 border-r-1 border-bg-content2 h-full"
-                                                onClick={null}
-                                            >
-                                                <div className="p-2 text-center text-default-500">
-                                                    <RiArrowUpFill fontSize="1.42rem" />
-                                                    {0}
-                                                </div>
-                                            </div>
-                                            <div className="p-4 space-y-2">
-                                                <h4 className="font-medium">{item.title}</h4>
-                                                <p className="text-default-500">
-                                                    {item.description}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </CardBody>
-                                </Card>
+                                <FeatureRequestCard key={item.id} item={item} />
                             ))}
                         </div>
                     </div>
