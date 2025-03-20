@@ -61,9 +61,15 @@ function AuthForm({ viewMode = 'signup', hideHeader, hideLogo, onSuccess }) {
             }
         }
 
-        if (onSuccess) {
-            onSuccess(true);
-        }
+  } catch (error) {
+    setError(error.message);
+    setIsLoading(false);
+    return;
+  }
+}
+if (onSuccess) {
+  onSuccess(true);
+}
         setIsLoading(false);
     };
 
