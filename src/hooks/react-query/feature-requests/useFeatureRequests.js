@@ -56,18 +56,35 @@ export const useVotesForFeatureRequest = (featureRequestId, userId) => {
 
 // Function to create a new feature request
 const createFeatureRequest = async ({ title, description, user_id }) => {
-    const { error } = await supabaseClient.from('feature_requests').insert([
-        {
-            title,
-            description,
-            user_id,
-            status: 'idea',
-        },
-    ]);
+    // Insert new feature request
+    const { data, error } = await supabaseClient
+        .from('feature_requests')
+        .insert([
+            {
+                title,
+                description,
+                user_id,
+                status: 'idea',
+            },
+        ])
+        .select();
 
     if (error) {
         console.error('Error creating feature request:', error);
         throw new Error('Failed to create feature request');
+    }
+
+    // Automatically vote for the feature request that was just created
+    const { error: voteError } = await supabaseClient.from('feature_request_votes').insert([
+        {
+            request_id: data[0].id, // Use the id of the created feature request
+            user_id: user_id, // The user who created the feature request
+        },
+    ]);
+
+    if (voteError) {
+        console.error('Error adding vote for feature request:', voteError);
+        throw new Error('Failed to add vote for feature request');
     }
 };
 
@@ -114,15 +131,13 @@ const voteOnFeatureRequest = async ({ featureRequestId, userId, hasVoted }) => {
 };
 
 // Hook to vote/unvote on a feature request
-export const useVoteOnFeatureRequest = (featureRequestId) => {
+export const useVoteOnFeatureRequest = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
         mutationFn: voteOnFeatureRequest,
         onSuccess: () => {
             queryClient.cancelQueries();
-            // Invalidate and refetch the feature requests query for the user
-            // queryClient.invalidateQueries(['featureRequestVotes', featureRequestId]);
         },
     });
 };

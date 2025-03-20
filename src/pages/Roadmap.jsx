@@ -1,9 +1,9 @@
 import NavBar from '../components/marketing/Nav';
-import { Card, CardBody, Progress } from '@heroui/react';
+import { Progress } from '@heroui/react';
 import Footer from '../components/marketing/Footer.jsx';
-import { RiArrowUpFill } from 'react-icons/ri';
 import { useFeatureRequests } from '../hooks/react-query/feature-requests/useFeatureRequests.js';
 import { useUser } from '../hooks/react-query/user/useUser.js';
+import FeatureRequestCard from '../components/roadmap/FeatureRequestCard.jsx';
 
 function RoadmapPage() {
     const { data: user } = useUser();
@@ -16,18 +16,18 @@ function RoadmapPage() {
     ];
 
     return (
-        <div className="w-screen min-h-screen bg-content1">
+        <div className="w-screen min-h-screen bg-content2/50">
             <NavBar />
             <div className="container mx-auto max-w-[1280px] px-6">
                 <h1 className="text-left text-4xl font-bold pt-12 pb-6">Roadmap</h1>
                 <p className="font-medium">
                     What’s on the horizon for {import.meta.env.VITE_APP_NAME}
                 </p>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-[70vh] pt-12 pb-32">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-full pt-12 pb-32">
                     {columns.map((col) => (
                         <div
                             key={col.title}
-                            className="bg-content1 p-4 rounded-xl border-1 border-bg-content2"
+                            className="bg-content1 p-4 rounded-xl border-1 border-content3"
                         >
                             <div className="mb-3 pb-2">
                                 <h2 className={`text-lg font-semibold mb-2`}>{col.title}</h2>
@@ -39,28 +39,15 @@ function RoadmapPage() {
                                     aria-label="label decorator"
                                 />
                             </div>
-                            <div className="space-y-3">
+                            <div className="space-y-3 overflow-y-auto h-[70vh] p-2">
                                 {items
                                     ?.filter((item) => item.status === col.title)
                                     ?.map((item) => (
-                                        <Card key={item.id} shadow="sm">
-                                            <CardBody className="p-0">
-                                                <div className="flex items-center gap-0 h-24">
-                                                    <div
-                                                        className="flex flex-col justify-center hover:bg-content2 cursor-pointer p-4 border-r-1 border-bg-content2 h-full"
-                                                        onClick={null}
-                                                    >
-                                                        <div className="p-2 text-center text-default-500">
-                                                            <RiArrowUpFill fontSize="1.42rem" />
-                                                            {0}
-                                                        </div>
-                                                    </div>
-                                                    <h4 className="font-medium p-4">
-                                                        {item.title}
-                                                    </h4>
-                                                </div>
-                                            </CardBody>
-                                        </Card>
+                                        <FeatureRequestCard
+                                            key={item.id}
+                                            item={item}
+                                            isRoadmapCard
+                                        />
                                     ))}
                             </div>
                         </div>

@@ -2,7 +2,7 @@ import { Divider, Link, Image } from '@heroui/react';
 
 const Footer = () => {
     return (
-        <footer className="bg-content2 w-full">
+        <footer className="bg-content2/50 w-full">
             <Divider />
             <div className="container mx-auto flex flex-col md:flex-row justify-around flex-wrap gap-8 text-center md:text-left py-16">
                 {/* Logo Column */}
@@ -89,7 +89,7 @@ const Footer = () => {
                     </ul>
                 </div>
             </div>
-            <div className="w-full bg-content2 py-4 text-sm font-medium text-center text-default-600">
+            <div className="w-full py-4 text-sm font-medium text-center text-default-600">
                 {new Date().getFullYear()} &copy; Mailerfuse
             </div>
         </footer>

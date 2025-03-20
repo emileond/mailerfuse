@@ -1,8 +1,6 @@
 import NavBar from '../components/marketing/Nav';
 import {
     Button,
-    Card,
-    CardBody,
     Input,
     Textarea,
     Select,
@@ -11,13 +9,11 @@ import {
     Divider,
     Modal,
     ModalContent,
-    ModalHeader,
     ModalBody,
-    ModalFooter,
     useDisclosure,
 } from '@heroui/react';
 import Footer from '../components/marketing/Footer.jsx';
-import { RiArrowUpFill, RiCircleFill } from 'react-icons/ri';
+import { RiCircleFill } from 'react-icons/ri';
 import { useFeatureRequests } from '../hooks/react-query/feature-requests/useFeatureRequests.js';
 import { useCreateFeatureRequest } from '../hooks/react-query/feature-requests/useFeatureRequests.js';
 import { useUser } from '../hooks/react-query/user/useUser.js';
@@ -73,14 +69,13 @@ function FeatureRequestsPage() {
         { key: 'in progress', color: 'text-blue-400' },
         { key: 'done', color: 'text-success-400' },
     ];
+
     useEffect(() => {
         refetch();
     }, [status]);
 
-    console.log(errors);
-
     return (
-        <div className="w-screen min-h-screen bg-content1">
+        <div className="w-screen min-h-screen bg-content2/50">
             <NavBar />
             <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
                 <ModalContent>
@@ -95,7 +90,7 @@ function FeatureRequestsPage() {
                     Tell us what you’d like to see on {import.meta.env.VITE_APP_NAME}
                 </p>
                 <div className="flex flex-wrap md:flex-nowrap gap-6 pt-12 pb-32">
-                    <div className="bg-content1 p-4 rounded-xl border-1 border-bg-content2 basis-1/3 grow h-full">
+                    <div className="bg-content1 p-4 rounded-xl border-1 border-content3 basis-1/3 grow h-full">
                         <div className="space-y-2">
                             <h2 className={`text-lg font-semibold`}>Add your idea</h2>
                             <p className="text-default-600">
@@ -135,7 +130,7 @@ function FeatureRequestsPage() {
                             </Button>
                         </form>
                     </div>
-                    <div className="bg-content1 p-4 rounded-xl border-1 border-bg-content2 basis-2/3 grow min-h-[70vh]">
+                    <div className="bg-content1 p-4 rounded-xl border-1 border-content3 basis-2/3 grow min-h-[70vh]">
                         <Select
                             selectionMode="single"
                             size="sm"
@@ -186,7 +181,11 @@ function FeatureRequestsPage() {
                         <Divider className="my-3" />
                         <div className="space-y-3">
                             {items?.map((item) => (
-                                <FeatureRequestCard key={item.id} item={item} />
+                                <FeatureRequestCard
+                                    key={item.id}
+                                    item={item}
+                                    onAnonUserVote={onOpen}
+                                />
                             ))}
                         </div>
                     </div>

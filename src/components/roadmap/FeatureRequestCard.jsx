@@ -6,26 +6,34 @@ import {
     useVoteOnFeatureRequest,
 } from '../../hooks/react-query/feature-requests/useFeatureRequests.js';
 
-function FeatureRequestCard({ item }) {
+function FeatureRequestCard({ item, isRoadmapCard, onAnonUserVote }) {
     const { data: user } = useUser();
     const { data: votes, refetch, isFetching } = useVotesForFeatureRequest(item?.id, user?.id);
-    const { mutateAsync: voteOnFeatureRequest } = useVoteOnFeatureRequest(user?.id);
+    const { mutateAsync: voteOnFeatureRequest } = useVoteOnFeatureRequest();
 
     const handleVote = async () => {
+        if (!user) {
+            onAnonUserVote?.(true);
+            return;
+        }
+
         await voteOnFeatureRequest({
             featureRequestId: item?.id,
             userId: user?.id,
             hasVoted: !!votes?.hasVoted,
         });
-        refetch();
+        await refetch();
     };
 
     return (
-        <Card shadow="sm">
+        <Card
+            shadow="none"
+            className="border-1 border-content3  hover:bg-content2/50 transition-bg duration-300 ease-in-out"
+        >
             <CardBody className="p-0">
                 <div className="flex items-start gap-0 h-32">
                     <div
-                        className="flex flex-col justify-center hover:bg-content2 cursor-pointer p-4 border-r-1 border-bg-content2 h-full"
+                        className="flex flex-col justify-center w-14 hover:bg-content2 cursor-pointer p-4 border-r-1 border-content3 h-full"
                         onClick={handleVote}
                     >
                         {isFetching ? (
@@ -41,7 +49,13 @@ function FeatureRequestCard({ item }) {
                     </div>
                     <div className="p-4 space-y-2">
                         <h4 className="font-medium">{item.title}</h4>
-                        <p className="text-default-500">{item.description}</p>
+                        {isRoadmapCard ? (
+                            <p className="text-sm text-default-500 line-clamp-3">
+                                {item.description}
+                            </p>
+                        ) : (
+                            <p className="text-default-500 line-clamp-4">{item.description}</p>
+                        )}
                     </div>
                 </div>
             </CardBody>
