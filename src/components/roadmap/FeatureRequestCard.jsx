@@ -40,7 +40,7 @@ function FeatureRequestCard({ item, isRoadmapCard, onAnonUserVote }) {
                             <Spinner size="sm" color="default" />
                         ) : (
                             <div
-                                className={`p - 2 text-center text-default-500 ${votes?.hasVoted ? 'text-primary' : 'text-default-600'}`}
+                                className={`p-2 text-center text-default-500 ${votes?.hasVoted ? 'text-primary' : 'text-default-600'}`}
                             >
                                 <RiArrowUpFill fontSize="1.42rem" />
                                 {votes?.voteCount || 0}
