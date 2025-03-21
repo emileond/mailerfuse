@@ -5,11 +5,13 @@ import {
     useVotesForFeatureRequest,
     useVoteOnFeatureRequest,
 } from '../../hooks/react-query/feature-requests/useFeatureRequests.js';
+import { useNavigate } from 'react-router-dom';
 
 function FeatureRequestCard({ item, isRoadmapCard, onAnonUserVote }) {
     const { data: user } = useUser();
     const { data: votes, refetch, isFetching } = useVotesForFeatureRequest(item?.id, user?.id);
     const { mutateAsync: voteOnFeatureRequest } = useVoteOnFeatureRequest();
+    const navigate = useNavigate();
 
     const handleVote = async () => {
         if (!user) {
@@ -23,6 +25,10 @@ function FeatureRequestCard({ item, isRoadmapCard, onAnonUserVote }) {
             hasVoted: !!votes?.hasVoted,
         });
         await refetch();
+    };
+
+    const handleNavigate = () => {
+        return navigate(`/feature-requests/${item?.id}`);
     };
 
     return (
@@ -40,14 +46,14 @@ function FeatureRequestCard({ item, isRoadmapCard, onAnonUserVote }) {
                             <Spinner size="sm" color="default" />
                         ) : (
                             <div
-                                className={`p-2 text-center text-default-500 ${votes?.hasVoted ? 'text-primary' : 'text-default-600'}`}
+                                className={`p-2 self-center text-center text-default-500 ${votes?.hasVoted ? 'text-primary' : 'text-default-600'}`}
                             >
                                 <RiArrowUpFill fontSize="1.42rem" />
                                 {votes?.voteCount || 0}
                             </div>
                         )}
                     </div>
-                    <div className="p-4 space-y-2">
+                    <div className="p-4 space-y-2 cursor-pointer" onClick={handleNavigate}>
                         <h4 className="font-medium">{item.title}</h4>
                         {isRoadmapCard ? (
                             <p className="text-sm text-default-500 line-clamp-3">

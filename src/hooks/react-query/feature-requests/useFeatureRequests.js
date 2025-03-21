@@ -2,11 +2,16 @@ import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import { supabaseClient } from '../../../lib/supabase';
 
 // Fetch feature requests filtered by status
-const fetchFeatureRequests = async (statusList) => {
-    const { data, error } = await supabaseClient
-        .from('feature_requests')
-        .select('title, description, id, status')
-        .in('status', statusList);
+const fetchFeatureRequests = async ({ statusList, id }) => {
+    let query = supabaseClient.from('feature_requests').select('title, description, id, status');
+
+    if (id) {
+        query = query.eq('id', id).single(); // Fetch single item
+    } else if (statusList) {
+        query = query.in('status', statusList); // Fetch multiple items
+    }
+
+    const { data, error } = await query;
 
     if (error) {
         throw new Error('Failed to fetch feature requests');
@@ -39,7 +44,17 @@ const fetchVotesForFeatureRequest = async (featureRequestId, userId) => {
 export const useFeatureRequests = (user, statusList) => {
     return useQuery({
         queryKey: ['featureRequests', user?.id],
-        queryFn: () => fetchFeatureRequests(statusList),
+        queryFn: () => fetchFeatureRequests({ statusList }),
+        staleTime: 1000 * 60 * 120, // 2 hours
+    });
+};
+
+// Hook to fetch a single feature request by ID
+export const useFeatureRequestItem = (id) => {
+    return useQuery({
+        queryKey: ['featureRequest', id],
+        queryFn: () => fetchFeatureRequests({ id }),
+        enabled: !!id, // Only run the query if ID is provided
         staleTime: 1000 * 60 * 120, // 2 hours
     });
 };

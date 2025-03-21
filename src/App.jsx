@@ -26,6 +26,7 @@ import TOSPage from './pages/TOS.jsx';
 import AUPolicyPage from './pages/AUPolicyPage.jsx';
 import RoadmapPage from './pages/Roadmap.jsx';
 import FeatureRequestsPage from './pages/FeatureRequests.jsx';
+import FeatureRequestDetails from './pages/FeatureRequestDetails.jsx';
 
 function App() {
     const { isLoading } = useUser();
@@ -99,6 +100,10 @@ function App() {
         {
             path: '/feature-requests',
             element: <FeatureRequestsPage />,
+        },
+        {
+            path: '/feature-requests/:id',
+            element: <FeatureRequestDetails />,
         },
         {
             path: '/team',

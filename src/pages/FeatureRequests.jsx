@@ -11,6 +11,7 @@ import {
     ModalContent,
     ModalBody,
     useDisclosure,
+    Spinner,
 } from '@heroui/react';
 import Footer from '../components/marketing/Footer.jsx';
 import { RiCircleFill } from 'react-icons/ri';
@@ -26,7 +27,7 @@ import FeatureRequestCard from '../components/roadmap/FeatureRequestCard.jsx';
 function FeatureRequestsPage() {
     const [status, setStatus] = useState('idea');
     const { data: user } = useUser();
-    const { data: items, refetch } = useFeatureRequests(user, [status]);
+    const { data: items, refetch, isPending: itemsPending } = useFeatureRequests(user, [status]);
     const { mutateAsync: createFeatureRequest, isPending } = useCreateFeatureRequest(user);
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
@@ -130,7 +131,7 @@ function FeatureRequestsPage() {
                             </Button>
                         </form>
                     </div>
-                    <div className="bg-content1 p-4 rounded-xl border-1 border-content3 basis-2/3 grow min-h-[70vh]">
+                    <div className="bg-content1 p-4 rounded-xl border-1 border-content3 basis-2/3 grow min-h-[60vh]">
                         <Select
                             selectionMode="single"
                             size="sm"
@@ -179,7 +180,12 @@ function FeatureRequestsPage() {
                             ))}
                         </Select>
                         <Divider className="my-3" />
-                        <div className="space-y-3">
+                        <div className="space-y-3 h-full">
+                            {itemsPending && (
+                                <div className="flex justify-center items-center h-full">
+                                    <Spinner size="lg" />
+                                </div>
+                            )}
                             {items?.map((item) => (
                                 <FeatureRequestCard
                                     key={item.id}
