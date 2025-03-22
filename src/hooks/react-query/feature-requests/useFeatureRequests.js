@@ -118,7 +118,6 @@ export const useCreateFeatureRequest = (user) => {
 
 // Function to vote or unvote on a feature request
 const voteOnFeatureRequest = async ({ featureRequestId, userId, hasVoted }) => {
-    console.log('voting', featureRequestId, userId, hasVoted);
     if (hasVoted) {
         const { error } = await supabaseClient
             .from('feature_request_votes')
@@ -146,10 +145,67 @@ const voteOnFeatureRequest = async ({ featureRequestId, userId, hasVoted }) => {
 };
 
 // Hook to vote/unvote on a feature request
-export const useVoteOnFeatureRequest = () => {
+export const useVoteOnFeatureRequest = (featureRequestId) => {
+    return useMutation({
+        mutationFn: voteOnFeatureRequest,
+    });
+
+    // didn't use invalidateQueries because it's refetching everything for some reason
+};
+
+// Function to save a comment for a feature req
+const addFeatureRequestComment = async ({ comment, featureRequestId, user_id }) => {
+    // Insert new feature request
+    const { error } = await supabaseClient
+        .from('feature_request_comments')
+        .insert([
+            {
+                comment,
+                user_id,
+                request_id: featureRequestId,
+            },
+        ])
+        .select();
+
+    if (error) {
+        console.error('Error adding comment:', error);
+        throw new Error('Failed to save comment');
+    }
+};
+
+// Hook to create a new feature request
+export const useAddFeatureRequestComment = (featureRequestId) => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: voteOnFeatureRequest,
+        mutationFn: addFeatureRequestComment,
+        onSuccess: () => {
+            // Invalidate and refetch the feature requests query for the user
+            queryClient.invalidateQueries(['featureRequestComments', featureRequestId]);
+        },
+    });
+};
+
+// Fetch the comments for a feature request
+const fetchCommentsForFeatureRequest = async (featureRequestId) => {
+    const { data, error } = await supabaseClient
+        .from('feature_request_comments')
+        .select('comment, id, created_at')
+        .eq('request_id', featureRequestId);
+
+    if (error) {
+        console.error('Error fetching comments:', error);
+        throw new Error('Failed to fetch comments');
+    }
+
+    return data;
+};
+
+// Hook to fetch votes for a specific feature request and check if the user has voted
+export const useCommentsForFeatureRequest = (featureRequestId) => {
+    return useQuery({
+        queryKey: ['featureRequestComments', featureRequestId],
+        queryFn: () => fetchCommentsForFeatureRequest(featureRequestId),
+        staleTime: 1000 * 60 * 120, // 2 hrs
     });
 };

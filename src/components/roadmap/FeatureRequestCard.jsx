@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom';
 function FeatureRequestCard({ item, isRoadmapCard, onAnonUserVote }) {
     const { data: user } = useUser();
     const { data: votes, refetch, isFetching } = useVotesForFeatureRequest(item?.id, user?.id);
-    const { mutateAsync: voteOnFeatureRequest } = useVoteOnFeatureRequest();
+    const { mutateAsync: voteOnFeatureRequest } = useVoteOnFeatureRequest(item?.id);
     const navigate = useNavigate();
 
     const handleVote = async () => {
@@ -18,6 +18,8 @@ function FeatureRequestCard({ item, isRoadmapCard, onAnonUserVote }) {
             onAnonUserVote?.(true);
             return;
         }
+
+        console.log('voting', !!votes?.hasVoted);
 
         await voteOnFeatureRequest({
             featureRequestId: item?.id,
@@ -46,15 +48,20 @@ function FeatureRequestCard({ item, isRoadmapCard, onAnonUserVote }) {
                             <Spinner size="sm" color="default" />
                         ) : (
                             <div
-                                className={`p-2 self-center text-center text-default-500 ${votes?.hasVoted ? 'text-primary' : 'text-default-600'}`}
+                                className={`p-2 self-center text-center text-default-500 ${votes?.hasVoted ? 'text-primary' : 'text-default-500'}`}
                             >
                                 <RiArrowUpFill fontSize="1.42rem" />
                                 {votes?.voteCount || 0}
                             </div>
                         )}
                     </div>
-                    <div className="p-4 space-y-2 cursor-pointer" onClick={handleNavigate}>
-                        <h4 className="font-medium">{item.title}</h4>
+                    <div className="p-4 space-y-2">
+                        <h4
+                            className="font-medium cursor-pointer hover:text-primary"
+                            onClick={handleNavigate}
+                        >
+                            {item.title}
+                        </h4>
                         {isRoadmapCard ? (
                             <p className="text-sm text-default-500 line-clamp-3">
                                 {item.description}
