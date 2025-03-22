@@ -7,7 +7,7 @@ import { useLoginUser, useRegisterUser } from '../../hooks/react-query/user/useU
 import Logo from '../Logo';
 import ky from 'ky';
 
-function AuthForm({ viewMode = 'signup', hideHeader }) {
+function AuthForm({ viewMode = 'signup', hideHeader, hideLogo, onSuccess }) {
     const { mutateAsync: registerUser } = useRegisterUser();
     const { mutateAsync: loginUser } = useLoginUser();
     const {
@@ -25,24 +25,6 @@ function AuthForm({ viewMode = 'signup', hideHeader }) {
     }, [viewMode]);
 
     const watchPassword = watch('password');
-
-    async function validateEmail(email) {
-        try {
-            const response = await fetch(
-                'https://disposable.github.io/disposable-email-domains/domains.json',
-            );
-            if (!response.ok) {
-                return false;
-            }
-
-            const disposableDomains = await response.json();
-            const domain = email.split('@')[1];
-            return !disposableDomains.includes(domain); // This ensures the value is returned to the caller
-        } catch (error) {
-            console.error('Error validating email:', error);
-            return false; // Consider how you want to handle errors. This returns false as a default.
-        }
-    }
 
     const onSubmit = async (data) => {
         setIsLoading(true);
@@ -79,6 +61,9 @@ function AuthForm({ viewMode = 'signup', hideHeader }) {
             }
         }
 
+        if (onSuccess) {
+            onSuccess(true);
+        }
         setIsLoading(false);
     };
 
@@ -99,11 +84,12 @@ function AuthForm({ viewMode = 'signup', hideHeader }) {
     }
     return (
         <div>
-            {!hideHeader && (
-                <RouterLink to="/">
-                    <Logo />
-                </RouterLink>
-            )}
+            {!hideHeader ||
+                (!hideLogo && (
+                    <RouterLink to="/">
+                        <Logo />
+                    </RouterLink>
+                ))}
             <form onSubmit={handleSubmit(onSubmit)} className="min-w-96 flex flex-col gap-4 py-8">
                 {!hideHeader && (
                     <>
