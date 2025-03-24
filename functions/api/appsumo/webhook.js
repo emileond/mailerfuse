@@ -6,20 +6,24 @@ export async function onRequestPost(context) {
 
     try {
         const timestamp = context.request.headers.get('X-Appsumo-Timestamp');
-        console.log(timestamp);
         const sha = context.request.headers.get('X-Appsumo-Signature');
-        console.log(sha);
         const body = await context.request.json();
 
-        const ka = 'a0791470-7bcc-4fa1-95be-3f6134b1126c';
+        const apiKey = context.env.APPSUMO_PRIVATE_KEY;
 
         // build the message
         const message = `${timestamp}${JSON.stringify(body)}`;
 
-        const signature = crypto.createHmac('SHA256', ka).update(message).digest('hex');
-        console.log(signature);
+        const signature = crypto.createHmac('SHA256', apiKey).update(message).digest('hex');
 
-        console.log(signature === sha);
+        if (signature !== sha) {
+            return Response.json(
+                { error: 'Unauthorized' },
+                {
+                    status: 401,
+                },
+            );
+        }
 
         const { license_key, prev_license_key, event, license_status, tier, test, extra } = body;
 
