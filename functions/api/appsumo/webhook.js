@@ -9,6 +9,9 @@ export async function onRequestPost(context) {
             context.request.headers.get('Origin') || context.request.headers.get('Referer');
         const forwardedFor = context.request.headers.get('X-Forwarded-For'); // May contain multiple IPs
 
+        console.log(origin);
+        console.log(forwardedFor);
+
         if (!origin?.includes('appsumo.com') && !forwardedFor?.endsWith('appsumo.com')) {
             return Response.json(
                 { error: 'Unauthorized: Request not from AppSumo' },
