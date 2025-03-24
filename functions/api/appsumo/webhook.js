@@ -1,25 +1,23 @@
 import { createClient } from '@supabase/supabase-js';
+import crypto from 'node:crypto';
 
 export async function onRequestPost(context) {
     const supabase = createClient(context.env.SUPABASE_URL, context.env.SUPABASE_SERVICE_KEY);
 
     try {
-        // Check if the request comes from appsumo.com
-        const origin =
-            context.request.headers.get('Origin') || context.request.headers.get('Referer');
-        const forwardedFor = context.request.headers.get('X-Forwarded-For'); // May contain multiple IPs
-
-        console.log('origin', origin);
-        console.log('fw', forwardedFor);
-
-        if (!origin?.includes('appsumo.com') && !forwardedFor?.endsWith('appsumo.com')) {
-            return Response.json(
-                { error: 'Unauthorized: Request not from AppSumo' },
-                { status: 401 },
-            );
-        }
-
+        const timestamp = context.request.headers.get('X-Appsumo-Timestamp');
+        const sha = context.request.headers.get('X-Appsumo-Signature');
         const body = await context.request.json();
+
+        const ka = 'a0791470-7bcc-4fa1-95be-3f6134b1126c';
+
+        // build the message
+        const message = `${timestamp}${body}`;
+
+        const signature = crypto.createHmac('SHA256', ka).update(message).digest('hex');
+
+        console.log(signature === sha);
+
         const { license_key, prev_license_key, event, license_status, tier, test, extra } = body;
 
         // Validate input
