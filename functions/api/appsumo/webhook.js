@@ -14,7 +14,7 @@ export async function onRequestPost(context) {
         const ka = 'a0791470-7bcc-4fa1-95be-3f6134b1126c';
 
         // build the message
-        const message = `${timestamp}${body}`;
+        const message = `${timestamp}${JSON.stringify(body)}`;
 
         const signature = crypto.createHmac('SHA256', ka).update(message).digest('hex');
         console.log(signature);
