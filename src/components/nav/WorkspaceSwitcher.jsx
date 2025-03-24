@@ -44,7 +44,6 @@ function WorkspaceSwitcher() {
       {workspaces?.map((workspace) => (
         <SelectItem
           key={workspace.workspace_id}
-          value={workspace.workspace_id}
           onClick={() => setCurrentWorkspace(workspace)}
         >
           {workspace.name}

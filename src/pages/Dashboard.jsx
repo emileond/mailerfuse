@@ -94,6 +94,22 @@ function DashboardPage() {
             });
         } catch (error) {
             console.error(error);
+            if (error.response) {
+                try {
+                    const errorData = await error.response.json();
+
+                    // Check for insufficient credits error
+                    if (errorData.error_code === 'INSUFFICIENT_CREDITS') {
+                        toast('Not enough credits', {
+                            type: 'error',
+                            duration: 5000,
+                        });
+                        setInsufficientCredits(true);
+                    }
+                } catch (jsonError) {
+                    console.error('Error parsing error response:', jsonError);
+                }
+            }
         } finally {
             setIsSingleLoading(false);
             await queryClient.invalidateQueries({
@@ -463,34 +479,36 @@ function DashboardPage() {
                             </Tab>
                             <Tab key="single" title="Single email">
                                 <main className="max-w-xl flex flex-col gap-6 mx-auto py-3">
-                                    <div>
-                                        <h5 className="text-sm font-medium text-default-500 mb-3">
-                                            Email address
-                                        </h5>
-                                        <form
-                                            onSubmit={handleSubmit(onSubmit)}
-                                            className="w-full flex gap-3"
-                                        >
-                                            <Input
-                                                size="lg"
-                                                type="email"
-                                                isClearable
-                                                placeholder="Enter an email address"
-                                                {...register('email', {
-                                                    required: 'Email is required',
-                                                })}
-                                            />
-
-                                            <Button
-                                                type="submit"
-                                                size="lg"
-                                                variant="bordered"
-                                                isLoading={isSingleLoading}
+                                    <Card shadow="sm">
+                                        <CardBody>
+                                            <h5 className="text-sm font-medium text-default-500 mb-3">
+                                                Email address
+                                            </h5>
+                                            <form
+                                                onSubmit={handleSubmit(onSubmit)}
+                                                className="w-full flex gap-3"
                                             >
-                                                Verify
-                                            </Button>
-                                        </form>
-                                    </div>
+                                                <Input
+                                                    size="lg"
+                                                    type="email"
+                                                    isClearable
+                                                    placeholder="Enter an email address"
+                                                    {...register('email', {
+                                                        required: 'Email is required',
+                                                    })}
+                                                />
+
+                                                <Button
+                                                    type="submit"
+                                                    size="lg"
+                                                    variant="bordered"
+                                                    isLoading={isSingleLoading}
+                                                >
+                                                    Verify
+                                                </Button>
+                                            </form>
+                                        </CardBody>
+                                    </Card>
                                     {singleVerification && (
                                         <div>
                                             <h5 className="text-sm font-medium text-default-500 mb-3">

@@ -100,7 +100,7 @@ function UserMenu({ avatarOnly }) {
                         size="lg"
                         className="justify-between px-3 border"
                         endContent={<RiExpandUpDownLine fontSize={ICON_SIZE - 6} />}
-                        name={user?.data?.name || 'User'}
+                        name={userProfile?.name || 'User'}
                         description={user?.email || 'email'}
                         avatarProps={{
                             size: 'sm',
@@ -113,7 +113,7 @@ function UserMenu({ avatarOnly }) {
                 <DropdownSection showDivider>
                     <DropdownItem textValue="user">
                         <User
-                            name={user?.data?.name || 'User'}
+                            name={userProfile?.name || 'User'}
                             description={user?.email || 'email'}
                             avatarProps={{
                                 className: 'hidden',

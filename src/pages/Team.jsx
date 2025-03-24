@@ -183,10 +183,10 @@ function TeamPage() {
                                             editMember ? [editMember.role] : ['member']
                                         }
                                     >
-                                        <SelectItem key="admin" value="admin">
+                                        <SelectItem key="admin">
                                             Admin
                                         </SelectItem>
-                                        <SelectItem key="member" value="member">
+                                        <SelectItem key="member">
                                             Member
                                         </SelectItem>
                                     </Select>

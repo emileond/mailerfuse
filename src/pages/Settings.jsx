@@ -21,6 +21,20 @@ import Paywall from '../components/marketing/Paywall.jsx';
 import { MdCelebration } from 'react-icons/md';
 import dayjs from 'dayjs';
 
+// Function to get total credits based on LTD plan
+const getTotalCredits = (ltdPlan) => {
+    switch (ltdPlan) {
+        case 'plan 1':
+            return 10000;
+        case 'plan 2':
+            return 25000;
+        case 'plan 3':
+            return 50000;
+        default:
+            return 0;
+    }
+};
+
 function SettingsPage() {
     const [currentWorkspace] = useCurrentWorkspace();
     const { data: credits } = useWorkspaceCredits(currentWorkspace);
@@ -134,6 +148,9 @@ function SettingsPage() {
                                         <small>Available credits</small>
                                         <h3 className="text-xl font-semibold">
                                             {Intl.NumberFormat().format(credits?.available_credits)}
+                                            {currentWorkspace?.is_ltd && (
+                                                <span> / {Intl.NumberFormat().format(getTotalCredits(currentWorkspace?.ltd_plan))}</span>
+                                            )}
                                         </h3>
                                     </div>
                                 </div>
@@ -142,7 +159,7 @@ function SettingsPage() {
                                     size="sm"
                                     color="primary"
                                     minValue={0}
-                                    maxValue={25000}
+                                    maxValue={currentWorkspace?.is_ltd ? getTotalCredits(currentWorkspace?.ltd_plan) : 25000}
                                     value={credits?.available_credits}
                                     className="my-2"
                                 />
