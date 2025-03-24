@@ -6,7 +6,9 @@ export async function onRequestPost(context) {
 
     try {
         const timestamp = context.request.headers.get('X-Appsumo-Timestamp');
+        console.log(timestamp);
         const sha = context.request.headers.get('X-Appsumo-Signature');
+        console.log(sha);
         const body = await context.request.json();
 
         const ka = 'a0791470-7bcc-4fa1-95be-3f6134b1126c';
@@ -15,6 +17,7 @@ export async function onRequestPost(context) {
         const message = `${timestamp}${body}`;
 
         const signature = crypto.createHmac('SHA256', ka).update(message).digest('hex');
+        console.log(signature);
 
         console.log(signature === sha);
 
