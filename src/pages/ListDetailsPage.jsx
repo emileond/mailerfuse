@@ -3,18 +3,43 @@ import AppLayout from '../components/layout/AppLayout'
 import PageLayout from '../components/layout/PageLayout'
 import useCurrentWorkspace from '../hooks/useCurrentWorkspace'
 import { useEmailLists } from '../hooks/react-query/email-lists/useEmailLists'
-import { Card, CardBody, CardHeader, Chip, Divider } from "@heroui/react"
+import { useListRecords } from '../hooks/react-query/email-lists/useListRecords'
+import { 
+  Card, 
+  CardBody, 
+  CardHeader, 
+  Chip, 
+  Divider,
+  Table,
+  TableHeader,
+  TableBody,
+  TableColumn,
+  TableRow,
+  TableCell,
+  Button,
+  Pagination
+} from "@heroui/react"
 import { PiFileCsvDuotone } from 'react-icons/pi'
 import { useEffect, useState } from 'react'
 import { RiCircleFill } from 'react-icons/ri'
 import { ResponsiveContainer, PieChart, Pie, Tooltip, Cell } from 'recharts'
 import ExportBtn from '../components/lists/ExportListBtn'
+import EmptyState from '../components/EmptyState'
 
 function ListDetailsPage() {
   const [currentWorkspace] = useCurrentWorkspace()
   const { data } = useEmailLists(currentWorkspace)
   const { id } = useParams()
   const [list, setList] = useState(null)
+  const [page, setPage] = useState(1)
+  const pageSize = 10
+
+  // Fetch list records with pagination
+  const { data: recordsData, isLoading } = useListRecords({
+    listId: id,
+    page,
+    pageSize
+  })
 
   useEffect(() => {
     if (data && id) {
@@ -130,7 +155,7 @@ function ListDetailsPage() {
                           'unknown',
                         ].map((key) => ({
                           name: key,
-                          value: list.summary[key],
+                          value: list?.summary?.[key] || 0,
                         }))}
                         dataKey="value"
                         nameKey="name"
@@ -164,13 +189,98 @@ function ListDetailsPage() {
                             />
                             <span>{key}</span>
                           </div>
-                          <span>{list?.summary[key]}</span>
+                          <span>{list?.summary?.[key] || 0}</span>
                         </div>
                       )
                     )}
                   </div>
                 </div>
               )}
+            </CardBody>
+          </Card>
+
+          {/* Email Records Table */}
+          <Card>
+            <CardHeader className="text-default-600">Email Records</CardHeader>
+            <Divider />
+            <CardBody>
+              <div className="min-h-[400px]">
+                <Table
+                  aria-label="Email records table"
+                  bottomContent={
+                    recordsData?.count > pageSize ? (
+                      <div className="flex w-full justify-center">
+                        <Pagination
+                          isCompact
+                          showControls
+                          showShadow
+                          color="primary"
+                          page={page}
+                          total={Math.ceil(recordsData?.count / pageSize)}
+                          onChange={(newPage) => setPage(newPage)}
+                        />
+                      </div>
+                    ) : null
+                  }
+                  classNames={{
+                    wrapper: "min-h-[400px]"
+                  }}
+                >
+                  <TableHeader>
+                    <TableColumn>EMAIL</TableColumn>
+                    <TableColumn>STATUS</TableColumn>
+                    <TableColumn>SCORE</TableColumn>
+                    <TableColumn>DOMAIN STATUS</TableColumn>
+                    <TableColumn>MX RECORD</TableColumn>
+                  </TableHeader>
+                  <TableBody 
+                    isLoading={isLoading}
+                    loadingContent={"Loading email records..."}
+                    emptyContent={
+                      !isLoading && (
+                        <EmptyState 
+                          title="No email records found" 
+                          description="There are no email records available for this list."
+                        />
+                      )
+                    }
+                  >
+                    {recordsData?.data?.map((record) => (
+                      <TableRow key={record.email}>
+                        <TableCell>{record.email}</TableCell>
+                        <TableCell>
+                          <Chip
+                            variant="flat"
+                            color={getKeyColor(record.status)}
+                            size="sm"
+                          >
+                            {record.status}
+                          </Chip>
+                        </TableCell>
+                        <TableCell>{record.score}</TableCell>
+                        <TableCell>
+                          <Chip
+                            variant="flat"
+                            color={record.domain_status === 'active' ? 'success' : 'danger'}
+                            size="sm"
+                          >
+                            {record.domain_status}
+                          </Chip>
+                        </TableCell>
+                        <TableCell>
+                          <Chip
+                            variant="flat"
+                            color={record.mx_record ? 'success' : 'danger'}
+                            size="sm"
+                          >
+                            {record.mx_record ? 'Yes' : 'No'}
+                          </Chip>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
             </CardBody>
           </Card>
         </div>
