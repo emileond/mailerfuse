@@ -17,7 +17,7 @@ const TakuWidget = () => {
             scriptElement.onload = () => {
                 if (window.Taku) {
                     window.Taku('news:boot', {
-                        api_public_key: import.meta.env.VITE_TAKU_API_KEY,
+                        api_public_key: import.meta.env.VITE_TAKU_PUBLIC_KEY,
                         position: 'right',
                         custom_launcher: '.taku-launcher',
                         custom_launcher_options: {
