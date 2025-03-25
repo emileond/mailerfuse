@@ -18,11 +18,12 @@ import { RiCircleFill } from 'react-icons/ri';
 import { useFeatureRequests } from '../hooks/react-query/feature-requests/useFeatureRequests.js';
 import { useCreateFeatureRequest } from '../hooks/react-query/feature-requests/useFeatureRequests.js';
 import { useUser } from '../hooks/react-query/user/useUser.js';
-import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useEffect, useState, useMemo } from 'react';
+import { useForm, useWatch } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import AuthForm from '../components/auth/AuthForm.jsx';
 import FeatureRequestCard from '../components/roadmap/FeatureRequestCard.jsx';
+import uFuzzy from '@leeoniya/ufuzzy';
 
 function FeatureRequestsPage() {
     const [status, setStatus] = useState('idea');
@@ -35,8 +36,47 @@ function FeatureRequestsPage() {
         register,
         handleSubmit,
         reset,
+        control,
         formState: { errors },
     } = useForm();
+
+    // Watch the title input for changes
+    const titleValue = useWatch({
+        control,
+        name: 'title',
+        defaultValue: '',
+    });
+
+    // Initialize uFuzzy instance
+    const fuzzy = useMemo(
+        () =>
+            new uFuzzy({
+                intraMode: 1,
+                intraIns: 1,
+                intraSub: 1,
+                intraTrn: 1,
+                intraDel: 1,
+            }),
+        [],
+    );
+
+    // Filter items based on title input
+    const filteredItems = useMemo(() => {
+        if (!items || !titleValue.trim()) {
+            return items;
+        }
+
+        const haystack = items.map((item) => item.title);
+        const needle = titleValue.trim();
+
+        const idxs = fuzzy.filter(haystack, needle);
+
+        if (!idxs) {
+            return items;
+        }
+
+        return idxs.map((i) => items[i]);
+    }, [items, titleValue, fuzzy]);
 
     const onSubmit = async (data) => {
         if (!user) {
@@ -109,6 +149,8 @@ function FeatureRequestsPage() {
                                 label="Title"
                                 labelPlacement="outside"
                                 placeholder="Keep it short"
+                                isClearable
+                                onClear={() => reset({ title: '' })}
                                 isInvalid={!!errors?.title}
                                 errorMessage={errors?.title?.message}
                             />
@@ -186,7 +228,12 @@ function FeatureRequestsPage() {
                                     <Spinner size="lg" />
                                 </div>
                             )}
-                            {items?.map((item) => (
+                            {titleValue.trim() && filteredItems?.length === 0 && (
+                                <div className="text-center py-4 text-default-500">
+                                    No similar suggestions found. Your idea might be unique!
+                                </div>
+                            )}
+                            {filteredItems?.map((item) => (
                                 <FeatureRequestCard
                                     key={item.id}
                                     item={item}
