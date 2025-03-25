@@ -9,14 +9,14 @@ export async function onRequestPost(context) {
 
     // basic error handling
     if (!email) {
-        return new Response(JSON.stringify({ error: 'Missing required fields' }), {
+        return Response.json({ error: 'Missing required fields' }, {
             status: 400,
         });
     }
 
     // check if api key is valid
     if (!apiKey) {
-        return new Response(JSON.stringify({ error: 'API key is missing' }), {
+        return Response.json({ error: 'API key is missing' }, {
             status: 401,
         });
     }
@@ -32,7 +32,7 @@ export async function onRequestPost(context) {
         .single();
 
     if (error || !data) {
-        return new Response(JSON.stringify({ error: 'Invalid API key' }), {
+        return Response.json({ error: 'Invalid API key' }, {
             status: 401,
         });
     }
@@ -48,7 +48,7 @@ export async function onRequestPost(context) {
         .single();
 
     if (creditsError) {
-        return new Response(JSON.stringify({ error: creditsError.message }), {
+        return Response.json({ error: creditsError.message }, {
             status: 500,
         });
     }
@@ -57,11 +57,11 @@ export async function onRequestPost(context) {
     const notEnoughCredits = CREDITS_REQUIRED > available_credits;
 
     if (notEnoughCredits) {
-        return new Response(
-            JSON.stringify({
+        return Response.json(
+            {
                 error: 'Not enough credits',
                 error_code: 'INSUFFICIENT_CREDITS',
-            }),
+            },
             { status: 403 },
         );
     }
@@ -74,7 +74,7 @@ export async function onRequestPost(context) {
     });
 
     if (deductCreditsError) {
-        return new Response(JSON.stringify({ error: error.message }), {
+        return Response.json({ error: deductCreditsError.message }, {
             status: 500,
         });
     }
@@ -123,21 +123,19 @@ export async function onRequestPost(context) {
 
         const status = score >= 75 ? 'deliverable' : score >= 60 ? 'risky' : 'undeliverable';
 
-        return new Response(
-            JSON.stringify({
-                email,
-                status,
-                score: Math.max(0, Math.min(100, score)),
-                syntax_error: validationResult.syntax_error,
-                gibberish: validationResult.gibberish,
-                role: validationResult.role,
-                did_you_mean: validationResult.did_you_mean,
-                disposable: validationResult.disposable,
-                domain_status,
-                mx_record,
-                workspace_id: workspace_id,
-            }),
-        );
+        return Response.json({
+            email,
+            status,
+            score: Math.max(0, Math.min(100, score)),
+            syntax_error: validationResult.syntax_error,
+            gibberish: validationResult.gibberish,
+            role: validationResult.role,
+            did_you_mean: validationResult.did_you_mean,
+            disposable: validationResult.disposable,
+            domain_status,
+            mx_record,
+            workspace_id: workspace_id,
+        });
     }
 
     const recordsResult = await verifyRecords(domain);
@@ -150,19 +148,17 @@ export async function onRequestPost(context) {
     score += recordsResult.score;
     const status = score >= 75 ? 'deliverable' : score >= 60 ? 'risky' : 'undeliverable';
 
-    return new Response(
-        JSON.stringify({
-            email,
-            status,
-            score: Math.max(0, Math.min(100, score)),
-            syntax_error: validationResult.syntax_error,
-            gibberish: validationResult.gibberish,
-            role: validationResult.role,
-            did_you_mean: validationResult.did_you_mean,
-            disposable: validationResult.disposable,
-            domain_status: recordsResult.domain_status,
-            mx_record: recordsResult.mx_record,
-            workspace_id: workspace_id,
-        }),
-    );
+    return Response.json({
+        email,
+        status,
+        score: Math.max(0, Math.min(100, score)),
+        syntax_error: validationResult.syntax_error,
+        gibberish: validationResult.gibberish,
+        role: validationResult.role,
+        did_you_mean: validationResult.did_you_mean,
+        disposable: validationResult.disposable,
+        domain_status: recordsResult.domain_status,
+        mx_record: recordsResult.mx_record,
+        workspace_id: workspace_id,
+    });
 }

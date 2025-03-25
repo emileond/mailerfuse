@@ -15,11 +15,14 @@ import useCurrentWorkspace from '../hooks/useCurrentWorkspace.js';
 import { useWorkspaceCredits } from '../hooks/react-query/credits/useWorkspaceCredits.js';
 import { useForm, Controller } from 'react-hook-form';
 import { useEffect, useState } from 'react';
-import { useUpdateWorkspace } from '../hooks/react-query/teams/useWorkspaces.js';
+import { supabaseClient } from '../lib/supabase.js';
 import toast from 'react-hot-toast';
 import Paywall from '../components/marketing/Paywall.jsx';
 import { MdCelebration } from 'react-icons/md';
 import dayjs from 'dayjs';
+import ky from 'ky';
+import { useQueryClient } from '@tanstack/react-query';
+import { useUser } from '../hooks/react-query/user/useUser.js';
 
 // Function to get total credits based on LTD plan
 const getTotalCredits = (ltdPlan) => {
@@ -38,9 +41,9 @@ const getTotalCredits = (ltdPlan) => {
 function SettingsPage() {
     const [currentWorkspace] = useCurrentWorkspace();
     const { data: credits } = useWorkspaceCredits(currentWorkspace);
-    const { mutateAsync: updateWorkspace, isPending } = useUpdateWorkspace();
     const [isLoading, setIsLoading] = useState(false);
-
+    const { data: user } = useUser();
+    const queryClient = useQueryClient();
     const [isPaywallOpen, setIsPaywallOpen] = useState(false);
 
     const {
@@ -57,10 +60,36 @@ function SettingsPage() {
         try {
             const id = currentWorkspace.workspace_id;
             const name = data.workspace_name;
-            await updateWorkspace({ workspaceId: id, name });
+
+            // Get the current session
+            const { data: sessionData } = await supabaseClient.auth.getSession();
+
+            // Make a request to the API endpoint using ky
+            const result = await ky
+                .post('/api/update-workspace', {
+                    json: {
+                        workspaceId: id,
+                        name,
+                        session: sessionData.session,
+                    },
+                })
+                .json();
+
             toast.success('Changes saved');
+            await queryClient.invalidateQueries(['workspaces', user?.id]);
         } catch (error) {
-            toast.error(error?.message || 'Failed to save changes, try again');
+            console.error(error);
+            if (error.response) {
+                try {
+                    const errorData = await error.response.json();
+                    toast.error(errorData.error || 'Failed to update workspace');
+                } catch (jsonError) {
+                    console.error('Error parsing error response:', jsonError);
+                    toast.error('Failed to save changes, try again');
+                }
+            } else {
+                toast.error(error?.message || 'Failed to save changes, try again');
+            }
         } finally {
             setIsLoading(false);
         }
@@ -130,7 +159,7 @@ function SettingsPage() {
                                     variant="solid"
                                     color="primary"
                                     isLoading={isLoading}
-                                    disabled={isPending}
+                                    disabled={isLoading}
                                 >
                                     Save
                                 </Button>
@@ -149,7 +178,13 @@ function SettingsPage() {
                                         <h3 className="text-xl font-semibold">
                                             {Intl.NumberFormat().format(credits?.available_credits)}
                                             {currentWorkspace?.is_ltd && (
-                                                <span> / {Intl.NumberFormat().format(getTotalCredits(currentWorkspace?.ltd_plan))}</span>
+                                                <span>
+                                                    {' '}
+                                                    /{' '}
+                                                    {Intl.NumberFormat().format(
+                                                        getTotalCredits(currentWorkspace?.ltd_plan),
+                                                    )}
+                                                </span>
                                             )}
                                         </h3>
                                     </div>
@@ -159,7 +194,11 @@ function SettingsPage() {
                                     size="sm"
                                     color="primary"
                                     minValue={0}
-                                    maxValue={currentWorkspace?.is_ltd ? getTotalCredits(currentWorkspace?.ltd_plan) : 25000}
+                                    maxValue={
+                                        currentWorkspace?.is_ltd
+                                            ? getTotalCredits(currentWorkspace?.ltd_plan)
+                                            : 25000
+                                    }
                                     value={credits?.available_credits}
                                     className="my-2"
                                 />

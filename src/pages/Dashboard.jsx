@@ -149,7 +149,7 @@ function DashboardPage() {
 
                     try {
                         const { data: session } = await supabaseClient.auth.getSession();
-                        const res = await ky
+                        const npm = await ky
                             .post('/api/save-list', {
                                 json: {
                                     fileName,

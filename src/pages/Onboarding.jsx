@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useUser } from '../hooks/react-query/user/useUser';
-import { useCreateWorkspace, useWorkspaces } from '../hooks/react-query/teams/useWorkspaces';
+import { useWorkspaces } from '../hooks/react-query/teams/useWorkspaces';
 import { useNavigate } from 'react-router-dom';
 import PageLayout from '../components/layout/PageLayout';
 import { Button, Input, Select, SelectItem } from "@heroui/react";
@@ -10,14 +10,18 @@ import { validateEmail } from '../utils/validateEmail.js';
 import useCurrentWorkspace from '../hooks/useCurrentWorkspace';
 import { useAddWorkspaceMember } from '../hooks/react-query/teams/useWorkspaceMembers';
 import toast from 'react-hot-toast';
+import ky from 'ky';
+import { supabaseClient } from '../lib/supabase.js';
+import { useQueryClient } from '@tanstack/react-query';
 
 function OnboardingPage() {
     const { data: user } = useUser();
     const { data: workspaces } = useWorkspaces(user);
-    const { mutateAsync: createWorkspace, isPending } = useCreateWorkspace(user);
     const navigate = useNavigate();
     const [isWorkspaceCreated, setIsWorkspaceCreated] = useState(false);
     const [currentWorkspace, setCurrentWorkspace] = useCurrentWorkspace();
+    const [isPending, setIsPending] = useState(false);
+    const queryClient = useQueryClient();
     const { mutateAsync: addWorkspaceMember, isPending: isAddPending } =
         useAddWorkspaceMember(currentWorkspace);
 
@@ -33,14 +37,39 @@ function OnboardingPage() {
     // Function to handle workspace creation
     const handleCreateWorkspace = async (formData) => {
         const { workspaceName } = formData;
+        setIsPending(true);
         try {
-            await createWorkspace({
-                name: workspaceName,
-                user_id: user.id,
-            });
+            // Get the current session
+            const { data: sessionData } = await supabaseClient.auth.getSession();
+
+            // Make a request to the API endpoint using ky
+            const result = await ky
+                .post('/api/create-workspace', {
+                    json: {
+                        name: workspaceName,
+                        user_id: user.id,
+                        session: sessionData.session,
+                    },
+                })
+                .json();
+
             toast.success('Workspace created successfully');
+            await queryClient.invalidateQueries(['workspaces', user?.id]);
         } catch (error) {
-            toast.error(error?.message || 'Failed to create workspace, try again');
+            console.error(error);
+            if (error.response) {
+                try {
+                    const errorData = await error.response.json();
+                    toast.error(errorData.error || 'Failed to create workspace');
+                } catch (jsonError) {
+                    console.error('Error parsing error response:', jsonError);
+                    toast.error('Failed to create workspace, try again');
+                }
+            } else {
+                toast.error(error?.message || 'Failed to create workspace, try again');
+            }
+        } finally {
+            setIsPending(false);
         }
     };
 

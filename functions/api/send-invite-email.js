@@ -5,9 +5,12 @@ export async function onRequestPost(context) {
 
     // check if api key is valid
     if (!apiKey || apiKey !== context.env.WEBHOOK_API_KEY) {
-        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-            status: 401,
-        });
+        return Response.json(
+            { error: 'Unauthorized' },
+            {
+                status: 401,
+            },
+        );
     }
 
     const body = await context.request.json();
@@ -15,21 +18,30 @@ export async function onRequestPost(context) {
 
     // Basic 400 error handling
     if (!type || !record) {
-        return new Response(JSON.stringify({ error: 'Missing parameters' }), {
-            status: 400,
-        });
+        return Response.json(
+            { error: 'Missing parameters' },
+            {
+                status: 400,
+            },
+        );
     }
     const { invite_email: email, status, invited_by } = record;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email || !emailRegex.test(email)) {
-        return new Response(JSON.stringify({ error: 'Invalid email format' }), {
-            status: 400,
-        });
+        return Response.json(
+            { error: 'Invalid email format' },
+            {
+                status: 400,
+            },
+        );
     }
     if (status !== 'pending') {
-        return new Response(JSON.stringify({ error: 'Invite not pending' }), {
-            status: 400,
-        });
+        return Response.json(
+            { error: 'Invite not pending' },
+            {
+                status: 400,
+            },
+        );
     }
 
     try {
@@ -53,9 +65,12 @@ export async function onRequestPost(context) {
                 console.log('E-mail already exists, sending email invite.');
             } else {
                 console.error('Error adding subscriber:', error);
-                return new Response(JSON.stringify({ error: 'Error adding subscriber' }), {
-                    status: 500,
-                });
+                return Response.json(
+                    { error: 'Error adding subscriber' },
+                    {
+                        status: 500,
+                    },
+                );
             }
         }
 
@@ -80,15 +95,15 @@ export async function onRequestPost(context) {
         });
 
         const data = await response.json();
-        return new Response(JSON.stringify({ data }), { status: 200 });
+        return Response.json({ data }, { status: 200 });
     } catch (error) {
         if (error.response) {
             // Handle non-successful responses
             const errorText = await error.response.text();
-            return new Response(errorText, { status: error.response.status });
+            return Response.json(errorText, { status: error.response.status });
         } else {
             // Handle network or other errors
-            return new Response('Internal Server Error', { status: 500 });
+            return Response.json('Internal Server Error', { status: 500 });
         }
     }
 }

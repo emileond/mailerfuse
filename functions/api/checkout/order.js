@@ -7,9 +7,12 @@ export async function onRequestPost(context) {
     const receivedSignature = context.request.headers.get('x-signature');
 
     if (!receivedSignature) {
-        return new Response(JSON.stringify({ error: 'Unauthorized: No signature' }), {
-            status: 401,
-        });
+        return Response.json(
+            { error: 'Unauthorized: No signature' },
+            {
+                status: 401,
+            },
+        );
     }
 
     const rawBody = await context.request.text();
@@ -28,9 +31,12 @@ export async function onRequestPost(context) {
         computedSignatureBuffer.length !== receivedSignatureBuffer.length ||
         !crypto.timingSafeEqual(computedSignatureBuffer, receivedSignatureBuffer)
     ) {
-        return new Response(JSON.stringify({ error: 'Unauthorized: Invalid signature' }), {
-            status: 401,
-        });
+        return Response.json(
+            { error: 'Unauthorized: Invalid signature' },
+            {
+                status: 401,
+            },
+        );
     }
 
     const body = JSON.parse(rawBody);
@@ -42,18 +48,21 @@ export async function onRequestPost(context) {
 
     // basic check
     if (!status || !product_id || !quantity || !workspace_id) {
-        return new Response(JSON.stringify({ error: 'Missing parameters' }), {
-            status: 400,
-        });
+        return Response.json(
+            { error: 'Missing parameters' },
+            {
+                status: 400,
+            },
+        );
     }
 
     // order and product check
     if (product_id !== Number(context.env.LEMONSQUEEZY_PRODUCT_ID)) {
-        return new Response(null, { status: 204 }); // No content to process
+        return Response.json(null, { status: 204 }); // No content to process
     }
 
     if (status !== 'paid' && refunded !== false) {
-        return new Response(null, { status: 204 }); // No action needed
+        return Response.json(null, { status: 204 }); // No action needed
     }
 
     const supabase = createClient(context.env.SUPABASE_URL, context.env.SUPABASE_SERVICE_KEY);
@@ -64,10 +73,13 @@ export async function onRequestPost(context) {
     });
 
     if (error) {
-        return new Response(JSON.stringify({ error: error.message }), {
-            status: 500,
-        });
+        return Response.json(
+            { error: error.message },
+            {
+                status: 500,
+            },
+        );
     }
 
-    return new Response(JSON.stringify({ data: 'success' }), { status: 200 });
+    return Response.json({ data: 'success' }, { status: 200 });
 }

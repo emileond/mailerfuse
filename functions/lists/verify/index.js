@@ -5,7 +5,7 @@ async function validateApiKey(apiKey, context, supabase) {
     if (!apiKey) {
         return {
             isValid: false,
-            response: new Response(JSON.stringify({ error: 'API key is missing' }), {
+            response: Response.json({ error: 'API key is missing' }, {
                 status: 401,
             }),
         };
@@ -21,7 +21,7 @@ async function validateApiKey(apiKey, context, supabase) {
     if (error || !data) {
         return {
             isValid: false,
-            response: new Response(JSON.stringify({ error: 'Invalid API key' }), {
+            response: Response.json({ error: 'Invalid API key' }, {
                 status: 401,
             }),
         };
@@ -39,7 +39,7 @@ export async function onRequestPost(context) {
 
     // basic error handling
     if (!emails) {
-        return new Response(JSON.stringify({ error: 'Missing required fields' }), {
+        return Response.json({ error: 'Missing required fields' }, {
             status: 400,
         });
     }
@@ -64,7 +64,7 @@ export async function onRequestPost(context) {
         .single();
 
     if (creditsError) {
-        return new Response(JSON.stringify({ error: creditsError.message }), {
+        return Response.json({ error: creditsError.message }, {
             status: 500,
         });
     }
@@ -73,11 +73,11 @@ export async function onRequestPost(context) {
     const notEnoughCredits = creditsNeeded > available_credits;
 
     if (notEnoughCredits) {
-        return new Response(
-            JSON.stringify({
+        return Response.json(
+            {
                 error: 'Not enough credits',
                 error_code: 'INSUFFICIENT_CREDITS',
-            }),
+            },
             { status: 403 },
         );
     } else {
@@ -97,7 +97,7 @@ export async function onRequestPost(context) {
 
         if (fileError) {
             console.log(fileError);
-            return new Response(JSON.stringify({ error: fileError.message }), {
+            return Response.json({ error: fileError.message }, {
                 status: 500,
             });
         }
@@ -127,7 +127,7 @@ export async function onRequestPost(context) {
             })
             .eq('id', listId);
 
-        return new Response(JSON.stringify({ list_id: listId }), {
+        return Response.json({ list_id: listId }, {
             status: 200,
         });
     }
@@ -141,7 +141,7 @@ export async function onRequestGet(context) {
 
     // basic error handling
     if (!id) {
-        return new Response(JSON.stringify({ error: 'Missing required fields' }), {
+        return Response.json({ error: 'Missing required fields' }, {
             status: 400,
         });
     }
@@ -164,10 +164,10 @@ export async function onRequestGet(context) {
         .single();
 
     if (error) {
-        return new Response(JSON.stringify({ error: error.message }), {
+        return Response.json({ error: error.message }, {
             status: 500,
         });
     }
 
-    return new Response(JSON.stringify({ status: data.status, summary: data.summary }));
+    return Response.json({ status: data.status, summary: data.summary });
 }
