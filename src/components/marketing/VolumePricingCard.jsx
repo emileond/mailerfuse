@@ -3,7 +3,7 @@ import { Button, Card, CardBody, CardFooter, CardHeader, Link, Slider } from '@h
 import { RiCheckFill } from 'react-icons/ri';
 import useCurrentWorkspace from '../../hooks/useCurrentWorkspace.js';
 
-function VolumePricingCard() {
+function VolumePricingCard({ isLanding }) {
     const [currentWorkspace] = useCurrentWorkspace();
     const COST_PER_CREDIT = 0.002;
 
@@ -146,7 +146,7 @@ function VolumePricingCard() {
                             as={Link}
                             className="w-full lemonsqueezy-button"
                             color="primary"
-                            href={URL}
+                            href={!isLanding ? URL : `${import.meta.env.VITE_PUBLIC_URL}/signup`}
                             isDisabled={!price}
                         >
                             Get credits

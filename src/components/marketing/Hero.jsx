@@ -1,6 +1,7 @@
 import { Button } from '@heroui/button';
 import { Chip } from '@heroui/react';
 import { RiArrowRightLine } from 'react-icons/ri';
+import { Link } from 'react-router-dom';
 
 export default function Hero() {
     return (
@@ -16,7 +17,7 @@ export default function Hero() {
                     Ensure your emails connect with real people. Our powerful verification tool
                     boosts deliverability and protects your sender reputation.
                 </p>
-                <Button color="primary" variant="shadow">
+                <Button as={Link} to="/signup" color="primary" variant="shadow">
                     Verify my list
                 </Button>
             </section>

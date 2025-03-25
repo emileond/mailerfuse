@@ -32,7 +32,7 @@ function LandingPage() {
                 ctaText="Get started"
             />
             <FeaturesGrid />
-            <Pricing volumePricing />
+            <Pricing volumePricing isLanding />
             <Faq />
             <Footer />
         </div>

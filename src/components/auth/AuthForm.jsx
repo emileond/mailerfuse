@@ -84,12 +84,11 @@ function AuthForm({ viewMode = 'signup', hideHeader, hideLogo, onSuccess }) {
     }
     return (
         <div>
-            {!hideHeader ||
-                (!hideLogo && (
-                    <RouterLink to="/">
-                        <Logo />
-                    </RouterLink>
-                ))}
+            {(!hideHeader || !hideLogo) && (
+                <RouterLink to="/">
+                    <Logo />
+                </RouterLink>
+            )}
             <form onSubmit={handleSubmit(onSubmit)} className="min-w-96 flex flex-col gap-4 py-8">
                 {!hideHeader && (
                     <>

@@ -1,4 +1,5 @@
 import { Button, Image } from '@heroui/react';
+import { Link } from 'react-router-dom';
 
 function Feature({ heading, description, ctaText, imageUrl, reverse = false, id }) {
     return (
@@ -23,7 +24,7 @@ function Feature({ heading, description, ctaText, imageUrl, reverse = false, id 
                 <h2 className="text-3xl font-bold mb-4">{heading}</h2>
                 <p className="text-lg text-gray-600 mb-6">{description}</p>
                 <div>
-                    <Button color="primary" size="lg">
+                    <Button as={Link} to="/signup" color="primary" size="lg">
                         {ctaText}
                     </Button>
                 </div>
