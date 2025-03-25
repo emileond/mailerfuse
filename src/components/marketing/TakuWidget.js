@@ -8,16 +8,16 @@ const TakuWidget = () => {
             scriptElement.id = 'taku-js';
             scriptElement.src = 'https://cdn.taku-app.com/js/latest.js';
             scriptElement.async = true;
-            
+
             const handleError = () => {
                 console.error('Failed to load Taku widget script');
             };
-            
+
             scriptElement.addEventListener('error', handleError);
             scriptElement.onload = () => {
                 if (window.Taku) {
                     window.Taku('news:boot', {
-                        api_public_key: process.env.REACT_APP_TAKU_API_KEY,
+                        api_public_key: import.meta.env.VITE_TAKU_API_KEY,
                         position: 'right',
                         custom_launcher: '.taku-launcher',
                         custom_launcher_options: {
@@ -26,7 +26,7 @@ const TakuWidget = () => {
                     });
                 }
             };
-            
+
             document.body.appendChild(scriptElement);
         }
         return () => {

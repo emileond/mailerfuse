@@ -139,6 +139,7 @@ function UserMenu({ avatarOnly }) {
                 </DropdownSection>
                 <DropdownSection>
                     <DropdownItem
+                        textValue="theme"
                         onPress={() => setDarkMode(!darkMode)}
                         startContent={
                             darkMode ? (
