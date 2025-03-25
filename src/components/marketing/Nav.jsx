@@ -55,7 +55,11 @@ export default function NavBar() {
                 </NavbarBrand>
                 {menuItems.map((item, index) => (
                     <NavbarItem key={index}>
-                        <Button as={Link} href={item.href} variant="light">
+                        <Button
+                            as={Link}
+                            href={`${import.meta.env.VITE_PUBLIC_URL}${item.href}`}
+                            variant="light"
+                        >
                             {item.name}
                         </Button>
                     </NavbarItem>
