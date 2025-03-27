@@ -4,7 +4,7 @@ import { useUser } from '../hooks/react-query/user/useUser';
 import { useWorkspaces } from '../hooks/react-query/teams/useWorkspaces';
 import { useNavigate } from 'react-router-dom';
 import PageLayout from '../components/layout/PageLayout';
-import { Button, Input, Select, SelectItem } from "@heroui/react";
+import { Button, Input, Select, SelectItem } from '@heroui/react';
 import { PiWarningBold } from 'react-icons/pi';
 import { validateEmail } from '../utils/validateEmail.js';
 import useCurrentWorkspace from '../hooks/useCurrentWorkspace';
@@ -34,8 +34,8 @@ function OnboardingPage() {
 
     const { register: registerInvite, handleSubmit: handleInviteSubmit } = useForm();
 
-    // Function to handle workspace creation
-    const handleCreateWorkspace = async (formData) => {
+    // Function to handle workspace name update
+    const handleUpdateWorkspace = async (formData) => {
         const { workspaceName } = formData;
         setIsPending(true);
         try {
@@ -44,29 +44,30 @@ function OnboardingPage() {
 
             // Make a request to the API endpoint using ky
             const result = await ky
-                .post('/api/create-workspace', {
+                .post('/api/update-workspace', {
                     json: {
+                        workspaceId: currentWorkspace.workspace_id,
                         name: workspaceName,
-                        user_id: user.id,
                         session: sessionData.session,
                     },
                 })
                 .json();
 
-            toast.success('Workspace created successfully');
+            toast.success('Workspace name updated successfully');
             await queryClient.invalidateQueries(['workspaces', user?.id]);
+            setIsWorkspaceCreated(true);
         } catch (error) {
             console.error(error);
             if (error.response) {
                 try {
                     const errorData = await error.response.json();
-                    toast.error(errorData.error || 'Failed to create workspace');
+                    toast.error(errorData.error || 'Failed to update workspace');
                 } catch (jsonError) {
                     console.error('Error parsing error response:', jsonError);
-                    toast.error('Failed to create workspace, try again');
+                    toast.error('Failed to update workspace, try again');
                 }
             } else {
-                toast.error(error?.message || 'Failed to create workspace, try again');
+                toast.error(error?.message || 'Failed to update workspace, try again');
             }
         } finally {
             setIsPending(false);
@@ -120,15 +121,24 @@ function OnboardingPage() {
     };
 
     useEffect(() => {
-        if (workspaces && workspaces.length > 0) {
-            workspaces.find((workspace) => {
-                if (workspace.role === 'owner') {
+        // If currentWorkspace is already set, we can proceed to the invite step
+        if (currentWorkspace && currentWorkspace.workspace_id) {
+            // Check if the user has already completed the name update step
+            if (currentWorkspace.name && currentWorkspace.name !== 'My workspace') {
+                setIsWorkspaceCreated(true);
+            }
+        } else if (workspaces && workspaces.length > 0) {
+            // If currentWorkspace is not set but workspaces exist, find the one where user is owner
+            const ownerWorkspace = workspaces.find((workspace) => workspace.role === 'owner');
+            if (ownerWorkspace) {
+                setCurrentWorkspace(ownerWorkspace);
+                // Check if the workspace name has been customized
+                if (ownerWorkspace.name && ownerWorkspace.name !== 'My workspace') {
                     setIsWorkspaceCreated(true);
-                    setCurrentWorkspace(workspace);
                 }
-            });
+            }
         }
-    }, [workspaces, user]);
+    }, [workspaces, currentWorkspace, user]);
 
     return (
         <div className="w-screen h-screen bg-content1 flex justify-center items-center">
@@ -138,7 +148,7 @@ function OnboardingPage() {
             >
                 {!isWorkspaceCreated ? (
                     <>
-                        <p className="my-3">Create a workspace to collaborate with your team</p>
+                        <p className="my-3">Update your workspace name to get started</p>
                         {errors.workspaceName && (
                             <div className="flex items-center gap-2 bg-danger-50 p-3 rounded-xl border border-danger-100 font-bold text-default-900 text-sm">
                                 <PiWarningBold className="text-danger-300 text-2xl" />
@@ -146,7 +156,7 @@ function OnboardingPage() {
                             </div>
                         )}
                         <form
-                            onSubmit={handleSubmit(handleCreateWorkspace)}
+                            onSubmit={handleSubmit(handleUpdateWorkspace)}
                             className="flex flex-col gap-6"
                         >
                             <Input
@@ -155,12 +165,13 @@ function OnboardingPage() {
                                 fullWidth
                                 placeholder="My workspace"
                                 aria-label="Workspace Name"
+                                defaultValue={currentWorkspace?.name || ''}
                                 {...register('workspaceName', {
                                     required: 'Workspace Name is required',
                                 })}
                             />
                             <Button color="primary" type="submit" isLoading={isPending}>
-                                Create Workspace
+                                Update Workspace Name
                             </Button>
                         </form>
                     </>
@@ -184,17 +195,22 @@ function OnboardingPage() {
                                                 format: async (value) => {
                                                     if (!value) return true; // Allow empty fields
                                                     const result = await validateEmail(value);
-                                                    return !result.syntax_error || 'Invalid email format';
+                                                    return (
+                                                        !result.syntax_error ||
+                                                        'Invalid email format'
+                                                    );
                                                 },
                                                 duplicate: (value, formValues) => {
                                                     if (!value) return true;
                                                     const emails = Object.values(formValues)
-                                                        .filter(v => v?.email)
-                                                        .map(v => v.email);
-                                                    return emails.filter(e => e === value).length === 1 || 
-                                                        'Duplicate email address';
-                                                }
-                                            }
+                                                        .filter((v) => v?.email)
+                                                        .map((v) => v.email);
+                                                    return (
+                                                        emails.filter((e) => e === value).length ===
+                                                            1 || 'Duplicate email address'
+                                                    );
+                                                },
+                                            },
                                         })}
                                         className="basis-4/3"
                                     />
